@@ -104,7 +104,7 @@
 1479308800 c:\compile_auas-master\code\tables.h
 	<string>
 
-1479262409 source:c:\compile_auas-master\code\main.cpp
+1479997268 source:c:\compile_auas-master\code\main.cpp
 	<iostream>
 	<stdio.h>
 	<map>
@@ -113,6 +113,7 @@
 	"syntax.h"
 	"tables.h"
 	"block.h"
+	"midCode.h"
 
 1479309541 source:c:\compile_auas-master\code\syntax.cpp
 	<iostream>
@@ -131,4 +132,12 @@
 	<fstream>
 	<string>
 	"syntax.h"
+
+1479996694 c:\compile_auas-master\code\midcode.h
+	<stdio.h>
+	<map>
+	<string>
+	"syntax.h"
+	"block.h"
+	"tables.h"
 

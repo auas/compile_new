@@ -35,6 +35,8 @@
 		<Unit filename="block.cpp" />
 		<Unit filename="block.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="midCode.cpp" />
+		<Unit filename="midCode.h" />
 		<Unit filename="syntax.cpp" />
 		<Unit filename="syntax.h" />
 		<Unit filename="tables.cpp" />
