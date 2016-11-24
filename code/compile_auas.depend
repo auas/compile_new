@@ -79,3 +79,56 @@
 	<string>
 	"syntax.h"
 
+1479308699 source:c:\compile_auas-master\code\block.cpp
+	<stdio.h>
+	<map>
+	<fstream>
+	<string>
+	"syntax.h"
+	"block.h"
+	"tables.h"
+
+1479133360 c:\compile_auas-master\code\syntax.h
+	<iostream>
+	<stdio.h>
+	<map>
+	<fstream>
+	<iostream>
+	<stdio.h>
+	<map>
+	<string>
+
+1479307333 c:\compile_auas-master\code\block.h
+	"tables.h"
+
+1479308800 c:\compile_auas-master\code\tables.h
+	<string>
+
+1479262409 source:c:\compile_auas-master\code\main.cpp
+	<iostream>
+	<stdio.h>
+	<map>
+	<fstream>
+	<string>
+	"syntax.h"
+	"tables.h"
+	"block.h"
+
+1479309541 source:c:\compile_auas-master\code\syntax.cpp
+	<iostream>
+	<stdio.h>
+	<map>
+	<fstream>
+	<string>
+	"syntax.h"
+	<sstream>
+
+1479308506 source:c:\compile_auas-master\code\tables.cpp
+	"tables.h"
+	<iostream>
+	<stdio.h>
+	<map>
+	<fstream>
+	<string>
+	"syntax.h"
+
