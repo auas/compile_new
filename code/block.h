@@ -4,7 +4,14 @@
 
 class block{
   public:
-
+      string funcName;
+      //int glob_stab_end_indx
+      int end_all_stab_indx;//符号表中最后一项+1
+      int main_start_stab_indx ;//main函数第一个变量在符号表中的位置，直接指向，没有偏移
+      int func_start_stab_indx;// 函数第一个变量在符号表中的位置，直接指向，没有偏移
+      int func_pare_stab_indx; // 函数最后一个形参在符号表中位置,偏移1
+      int func_local_stab_indx;//函数最后一个局部变量在符号表中的位置，偏移+1
+      int glob_stab_end_indx; //全局变量最后一个符号，非函数名称，在符号表中的下标，偏移+1
       string name;
       int Typ; //0 void 1 int 2 char
       string varTyp;
@@ -65,7 +72,10 @@ class block{
       block();
       void errormsg(string s,string token);
       void callSent();
+      symbolTab* checkST(string name, string funcName); //根据函数名称查name的符号
 
+      void showGlob();
+      void showMainLocal();
 
 };
 # endif

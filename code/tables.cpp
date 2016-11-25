@@ -96,6 +96,21 @@ int tables::enterVdFun(int step, string name){
   sbl_idx++;
   return ret;
 }//登陆无返回的函数
+
+int tables::enterFun(int step,string funcName,int p1_addr,int p1_num)//登记分程序表
+{
+  //btl_idx
+  btab[btl_idx].p1_addr = p1_addr;
+  btab[btl_idx].p1_num = p1_num;
+}
+int tables::enterFun(int step,string funcName,int p2_addr,int p2_num,int c_addr)//登记分程序表
+{
+  btab[btl_idx].p2_addr = p2_addr;
+  btab[btl_idx].p2_num = p2_num;
+  btab[btl_idx].c_addr = c_addr;
+  btl_idx++;
+}
+
 int tables::checkSbl(){
   ;
 }//查符号表，位置，返回符号表索引
@@ -147,16 +162,9 @@ int tables::getSbl_idx(){
   return sbl_idx;
 }
 
-void tables::enterBtab(int step,int btl_idx,int s_idx){
-  if(step==1)
-    btab[btl_idx].p1_addr = s_idx;
-  btab[btl_idx].p1_num++;
-}
-void tables::enterBtab(int step){
-  btl_idx++;
-}
 
-void tables::showBtab(string name){
+
+void tables::showBtab_all(string name){
   int typ;
   int cat;
   int ref;
@@ -204,4 +212,27 @@ bool tables::isThere(string name,int a,int b,int*cat,int*typ,int*ref){
 
   }
   return false;
+}
+
+
+void tables::showBtab(string funcName){
+  int cat,typ,ref;
+  bool cq = isThere(funcName,0,sbl_idx,&cat,&typ,&ref);
+  if (cq == 0){
+    cout<<"there is no func named: "<<funcName<<endl;
+  }
+  else{
+    blockTab tmp = btab[ref];
+    cout<<"&&&&&&&&&&  "<<funcName<<" &&&&&&&&&&&&&"<<endl;
+    //cout<<tmp.c_addr<<endl;
+    cout<<tmp.p1_addr<<endl;
+    cout<<tmp.p2_addr<<endl;
+    cout<<"****"<<endl;
+    showStab(tmp.p1_addr,tmp.p2_addr+1);
+    cout<<"****"<<endl;
+    cout<<tmp.p1_num<<endl;
+    cout<<tmp.p2_num<<endl;
+    //cout<<tmp.<<endl;
+    //cout<<tmp.<<endl;
+  }
 }

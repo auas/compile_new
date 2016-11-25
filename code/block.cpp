@@ -14,6 +14,13 @@ block::block(){
     c_addr=0;
     functyp = -1;
     tmp_btl_idx = 0;
+    funcName = "start"; //
+    func_start_stab_indx = -1;
+    func_pare_stab_indx = -1; // 函数最后一个形参在符号表中位置
+    func_local_stab_indx = -1;//函数最后一个局部变量在符号表中的位置
+    glob_stab_end_indx = 0;
+    main_start_stab_indx = 0;//main函数第一个变量在符号表中的位置，直接指向，没有偏移
+    end_all_stab_indx = 0; //符号表中最后一项+1
 }
 
 void block::expression(){
@@ -358,12 +365,12 @@ void block::paraList(){
             p1_addr = mytab.enterVar(Typ,name);
             cout<<"paraList: "<<name<<" type: "<<Typ<<endl;
             startP1=1;
-            mytab.enterBtab(1,tmp_btl_idx,p1_addr);
+            //mytab.enterBtab(1,tmp_btl_idx,p1_addr);
           }
           else{
             mytab.enterVar(Typ,name);
             cout<<"paraList: "<<name<<" type: "<<Typ<<endl;
-            mytab.enterBtab(2,tmp_btl_idx,p1_addr);
+            //mytab.enterBtab(2,tmp_btl_idx,p1_addr);
           }
           p1_num++;
           size_p1+=8/Typ; //根据类型增加参数的大小
@@ -392,8 +399,18 @@ void block::retFunc(){
     cout<<"error!: paraList no lparen  "<<syn.tmp_token<<endl;
     while(1);
   }
+
   else{
+
+    // add
+    if(funcName =="start"){
+      glob_stab_end_indx = mytab.getSbl_idx(); // 偏移+1
+    }
     tmp_btl_idx = mytab.enterReFun(1,name,Typ);
+    funcName = name; // 全局记录当前分析到的函数
+    func_start_stab_indx =  mytab.getSbl_idx();// 没有偏移！
+
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     cout<<"retfunc:  "<<name<<" type: "<<Typ<<endl;
     syn.get_token();
     paraList();
@@ -402,17 +419,28 @@ void block::retFunc(){
       while(1);
     }
     else{
+      func_pare_stab_indx = mytab.getSbl_idx(); //偏移+1
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       syn.get_token();
       cout<<"$$$  "<<syn.tmp_token<<endl;
       if(syn.typ=="rbrace"){
         cout<<"error! no ret for retfunc!"<<endl;
       }
+
+      int p1_num = func_pare_stab_indx - func_start_stab_indx; //形参个数
+      mytab.enterFun(2,funcName,func_start_stab_indx,p1_num);
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       statement();
       if(syn.typ!="rbrace"){
         cout<<"error!:func no rbrace "<<syn.tmp_token<<endl;
         while(1);
       }
       else{
+
+        func_local_stab_indx = mytab.getSbl_idx(); // 偏移+1
+        p2_num = func_local_stab_indx - func_pare_stab_indx;
+        mytab.enterFun(3,funcName,func_local_stab_indx-1,p2_num,0); //fix c_addr!
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         syn.get_token();
       }
     }
@@ -428,7 +456,18 @@ void block::voidFunc(){
     while(1);
   }
   else{
+    // add
+
+    if(funcName =="start"){
+      glob_stab_end_indx = mytab.getSbl_idx(); // 偏移+1
+    }
     tmp_btl_idx = mytab.enterVdFun(1,name);
+    funcName = name; // 全局记录当前分析到的函数
+    func_start_stab_indx =  mytab.getSbl_idx();// 没有偏移！
+
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
     cout<<"voidfunc:  "<<name<<" type: "<<Typ<<endl;
     syn.get_token();
     paraList();
@@ -437,18 +476,29 @@ void block::voidFunc(){
       while(1);
     }
     else{
+      func_pare_stab_indx = mytab.getSbl_idx(); //偏移+1
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
       syn.get_token();
       if(syn.typ=="rbrace"){
         cout<<"warnning! no ret for voidfunc!"<<endl;
         syn.get_token();
         return;
       }
+      int p1_num = func_pare_stab_indx - func_start_stab_indx; //形参个数
+      mytab.enterFun(2,funcName,func_start_stab_indx,p1_num);
+      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       statement();
       if(syn.typ!="rbrace"){
         cout<<"error!:func lose rbrace &&&"<<endl;
         while(1);
       }
       else{
+
+        func_local_stab_indx = mytab.getSbl_idx(); // 偏移+1
+        p2_num = func_local_stab_indx - func_pare_stab_indx;
+        mytab.enterFun(3,funcName,func_local_stab_indx-1,p2_num,0); //fix c_addr!
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         syn.get_token();
       }
     }
@@ -461,7 +511,7 @@ void block::statement(){
   //［＜常量说明＞］［＜变量说明＞］＜语句列＞
   const_auas();
   var(); // ToDo：改变登陆符号表和读取结果的方式！！
-  mytab.enterBtab(3);//finish! add idx
+  //mytab.enterBtab(3);//finish! add idx
   if(functyp==1&&syn.typ=="rbrace"){
     cout<<"error! ret func no return!"<<endl;
     //syn.get_token();
@@ -885,9 +935,16 @@ void block::mainFunc(){
       return;
     }
 
+  if(funcName =="start"){
+      glob_stab_end_indx = mytab.getSbl_idx(); // 偏移+1
+    }
+  funcName = "main";
+  tmp_btl_idx = mytab.enterVdFun(1,"main");
+
+  main_start_stab_indx = mytab.getSbl_idx();//main函数第一个变量在符号表中的位置，直接指向，没有偏移
 
   statement();
-
+  end_all_stab_indx = mytab.getSbl_idx();
     cout<<"finish main!"<<endl;
 }
 
@@ -921,4 +978,17 @@ void block::callSent(){
       syn.get_token();
     }
   }
+}
+
+
+symbolTab* block::checkST(string name, string funcName){
+
+}
+
+void block::showGlob(){
+    mytab.showStab(0,glob_stab_end_indx);
+}
+
+void block::showMainLocal(){
+  mytab.showStab(main_start_stab_indx,end_all_stab_indx);
 }

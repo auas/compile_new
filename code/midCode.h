@@ -21,6 +21,8 @@ void print_midCode(midCode cd); // 打印四元式
 
 symbolTab* genTmpVar();//产生一个新的中间变量
 
+int codeTpy(string op); //判断四元式符号类型
+
 
 
 class genTmpName{ // 产生string类型的中间变量名字
@@ -32,6 +34,6 @@ class genTmpName{ // 产生string类型的中间变量名字
 };
 
 class genTmpVar{
-    symbolTab
+    symbolTab a; // to fix!!
 };
 #endif // MIDCODE_H

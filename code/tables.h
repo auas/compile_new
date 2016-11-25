@@ -66,7 +66,13 @@ class tables{ // to do !!! limit name len !!! string 的问题！！
     void enterArry(int arrTyp,int len,int size_,string name);//登陆数组
     int enterStr(int size_,string s);//登陆字符串
     int enterReFun(int step,string funcName,int tp);//登陆有返回的函数
+
     int enterVdFun(int step, string name);//登陆无返回的函数
+
+    int enterFun(int step,string funcName,int p1_addr,int p1_num);//登记分程序表
+    int enterFun(int step,string funcName,int p2_addr,int p2_num,int c_addr);//登记分程序表
+
+
     int checkSbl();//查符号表，位置，返回符号表索引
 
     void enterCode(string s,int chose);//登陆代码：
@@ -79,11 +85,13 @@ class tables{ // to do !!! limit name len !!! string 的问题！！
     void showStab(int a,int b);
     void showStab(int a,int b,int c,int d); //输出符号表 a<=idx<b的内容
     int getSbl_idx();
-    void enterBtab(int step,int btl_idx,int s_idx); //p1_addr = s_idx
-    void enterBtab(int step);
-    void showBtab(string name);
+
+    void showBtab_all(string name);
     int isReFunc(string name);
     int isVdFunc(string name);
     bool isThere(string name,int a,int b,int*cat,int*typ,int*ref);
+
+    void showBtab(string funcName);
+
 };
 #endif
