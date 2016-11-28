@@ -1,6 +1,8 @@
 begin_func sr1   sr1==func名字在符号表中的指针
 add_para sr1  sr1==para 
-end_func sr1  sr2 函数结束，sr1函数名，sr2返回值	
+end_func sr1  sr2 函数结束，sr1函数名，sr2返回值
+set_lab sr1    //设置标签
+goto sr1  //无条件跳转	
 ###############################################
 set_I sr1 dst dst = sr1 //数值
 set sr1,sr2====sr1 = sr2//变量赋值
@@ -12,6 +14,17 @@ times sr1 sr2 dst //乘法
 slash sr1 sr2 dst //除法
 get_array sr1 sr2 dst //数组取值： dst = sr1[sr2]
 set_array_val",sr1,sr2,dst//数组赋值 sr1[sr2] = dst
+
+//跳转类：
+"blss",tmp1,tmp2,label // tmp1<tmp2跳转到label
+"bngtr",tmp1,tmp2,label tmp1<=tmp2
+"bnlss",tmp1,tmp2,label  tmp1>=tmp2
+"bgtr",tmp1,tmp2,label   tmp1>tmp2
+"beq",tmp1,tmp2,label   tmp1==tmp2
+bneq",tmp1,tmp2,label  tmp1!=tmp2
+"bnez",tmp1,label	tmp1!=0
+
+
 
 symbolTab dst = genTmp.getTmpVar();
 gen_Tmp_name("begin_func",func1);
