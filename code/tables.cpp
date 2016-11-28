@@ -5,7 +5,9 @@
 #include<fstream>
 #include<string>
 #include "syntax.h"
+#include "midCode.h"
 extern class syntax syn;
+
 
 tables::tables(){
   /*  int maxSbl = 2048;
@@ -234,5 +236,50 @@ void tables::showBtab(string funcName){
     cout<<tmp.p2_num<<endl;
     //cout<<tmp.<<endl;
     //cout<<tmp.<<endl;
+  }
+}
+
+
+void tables::cheq_stab(string name,int a,int b,symbolTab* ret){ //在中找a<x<=b name
+  for(int i = b;i>a;i--){
+    if(stab[i].name == name){
+      ret->name = stab[i].name;
+      ret->cat = stab[i].cat;
+      ret->typ = stab[i].typ;
+      ret->ref = stab[i].ref;
+      return;
+    }
+  }
+    ret->name ="#null";
+}
+
+void tables::cheq_stab(string name,symbolTab* ret){
+    for(int i=sbl_idx-1;i>-1;i--){
+      if(stab[i].name==name){
+        ret->name = stab[i].name;
+        ret->cat = stab[i].cat;
+        ret->typ = stab[i].typ;
+        ret->ref = stab[i].ref;
+      }
+      else{
+        ret->name ="#null";
+      }
+  }
+}
+
+void tables::print_midCode(midCode cd){
+    int typ = cd.typ;
+    if (typ==3)
+      cout<<cd.op<<" "<<cd.sr1->name.c_str()<<" "<<cd.sr2->name.c_str()<<" "<<cd.dst->name.c_str()<<endl;
+    else if (typ==2)
+      cout<<cd.op<<" "<<cd.sr1->name.c_str()<<" "<<cd.sr2->name.c_str()<<endl;
+    else if (typ==1)
+      cout<<cd.op<<" "<<cd.sr1->name.c_str()<<endl;
+    //errormsg("not def midcode typ","?");
+}
+
+void tables::print_midCode(){
+  for(int i=0;i<ctl_idx;i++){
+    print_midCode(*ctab[i]);
   }
 }

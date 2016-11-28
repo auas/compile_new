@@ -22,18 +22,6 @@ void main(){
   int aaa;
   char b;
   int c[10];
-  for(aaa=1;a<100;a=a+1){
-    printf("sdfsd",a);
-    scanf(c,b1);	
-  }
-  func1(1,2);
-  do{
-    if(g1>0){
-      b1 = c+1;
-    }
-    else{
-      b1=0;
-    }
-  }while(0)
-aaa = 3+func1(1,2+2*(3+7))*aaa;
+  aaa = 3+func1(1,2+2*(3+7))*aaa;
+  c[aaa] = aaa;
 }

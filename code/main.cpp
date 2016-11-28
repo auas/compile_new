@@ -14,19 +14,25 @@ using namespace std;
 class tables mytab;
 class syntax syn;
 class block bk;
-class genTmpName gen_Tmp_name;
+class genTmpVar genTmp;
+class genLabel genLb;
+class midCodeFunc mdF;
 
 
 
 int main()
 {
+
     /*
-    for (int i=0;i<10;i++){
-        string tmp = gen_Tmp_name.getName();
-        cout<<tmp<<endl;
-    }
-    //cout<<"hhh"<<endl;
-    */syn.get_token();
+    mytab.ctab[mytab.ctl_idx] = new midCode;
+    midCode* tmp_code = new midCode;
+    cout<<"1"<<endl;
+    tmp_code->op = "aabbccddeeff";
+    cout<< tmp_code->op<<endl;
+    while(1);
+        */
+
+    syn.get_token();
     bk.const_auas();
     bk.var();
     bk.funcs();
@@ -40,6 +46,10 @@ int main()
     bk.showGlob();
     cout<<"######################################"<<endl;
     bk.showMainLocal();
+    cout<<"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"<<endl;
+    mytab.print_midCode();
+    //string a;
+    //a.c_str();
 
 
     return 0;

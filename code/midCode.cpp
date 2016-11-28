@@ -1,15 +1,12 @@
 #include "midCode.h"
-
+#include "add.h"
 using namespace std;
 
-extern class genTmpName gen_Tmp_name;
 
-
-genTmpName::genTmpName(){
-
-    num = 0;
+genTmpVar::genTmpVar(){
+  num = 0;
 }
-string genTmpName::getName(){
+string genTmpVar::getName(){
     //cout<<"start get tmp name"<<endl;
     string ret;
     char tmp[100];
@@ -19,40 +16,148 @@ string genTmpName::getName(){
     ret = nameHead+temp1;
     return ret;
 }
-
-symbolTab* genTmpVar(){ //默认为int 类型的变量
-    string name = gen_Tmp_name.getName();
-    symbolTab tmp;
-    tmp.name = name;
-    tmp.cat = 2;
-    tmp.typ = 1;
-    tmp.ref = 0;
+void genTmpVar::getTmpVar(symbolTab* tmp){ //默锟斤拷为int 锟斤拷锟酵的憋拷锟斤拷
+    string name = getName();
+    tmp->name = name;
+    //cout<<"%%&&^^%%"<<name<<endl;
+    tmp->cat = 2;
+    tmp->typ = 1;
+    tmp->ref = 0;
 }
+
+genLabel::genLabel(){
+  num = 0;
+}
+string genLabel::getName(){
+  //cout<<"start get tmp name"<<endl;
+  string ret;
+  char tmp[100];
+  sprintf(tmp,"%d",num);
+  string temp1(tmp);
+  num++;
+  ret = nameHead+temp1;
+  return ret;
+}
+void genLabel::getLabel(symbolTab* tmp){
+  string name = getName();
+  tmp->name = name;
+  tmp->cat = 0;
+  tmp->typ = 0;
+  tmp->ref = 0;
+}
+
 
 
 int codeTpy(string op){
     return 0; // to fix!
 }
 
-void print_midCode(midCode cd){
-    int chq = codeTpy(cd.op);
-    symbolTab sr1 = *cd.sr1;
-    symbolTab sr2 = *cd.sr2;
-    symbolTab dst = *cd.dst;
-    switch(chq){
-        case 1: // 二元运算
-        {
-            cout<<cd.op<<" "<<sr1.name<<" "<<sr2.name<<" "<<dst.name<<endl;
-            break;
-        }
-        default:
-        {
-            break;
-        }
 
-
-    }
+midCodeFunc::midCodeFunc(){
+  a = 0;
 }
-void print_midCode(midCode cd);void print_midCode(midCode cd);
+void midCodeFunc::gen_mid_code(string op,symbolTab* sr1){
+  cout<<"%%%%%%%%%%^^^^^^^ 1 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
+  midCode* tmp_code = new midCode;
+  symbolTab* s1 = new symbolTab;
+  mytab.ctab[mytab.ctl_idx] = tmp_code;
+  tmp_code->op = op;
+
+  s1->name = sr1->name;
+  s1->cat = 0;//sr1->cat;
+  s1->typ = sr1->typ;
+  s1->ref = sr1->ref;
+
+  tmp_code->sr1 = s1;
+  tmp_code->typ = 1;
+  mytab.ctl_idx++;
+
+}
+void midCodeFunc::gen_mid_code(string op,symbolTab* sr1,symbolTab* sr2){
+cout<<"%%%%%%%%%%^^^^^^^ 2 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
+  cout<<"hahahah"<<endl;
+  midCode* tmp_code = new midCode;
+  symbolTab* s1 = new symbolTab;
+  symbolTab* s2 = new symbolTab;
+  mytab.ctab[mytab.ctl_idx] = tmp_code;
+  tmp_code->op = op;
+  s1->name = sr1->name;
+  s1->cat = 0;//sr1->cat;
+  s1->typ = sr1->typ;
+  s1->ref = sr1->ref;
+  tmp_code->sr1 = s1;
+  s2->name = sr2->name;
+  s2->cat = sr2->cat;
+  s2->typ = sr2->typ;
+  s2->ref = sr2->ref;
+  tmp_code->sr2 = s2;
+  tmp_code->typ = 2;
+  //cout<<"************"<<tmp_code->op.c_str()<<endl;
+  cout<<mytab.ctl_idx<<endl;
+  //cout<<"$$$$$$$$$$$$$$$$$$$$$$   "<<sr1->name.c_str()<<endl;
+  //cout<<"$$$$$$$$$$$$$$$$$$$$$$   "<<sr2->name.c_str()<<endl;
+  mytab.ctl_idx++;
+  /*
+  switch(op):
+    case "set_I":{
+      tmp_code->op = "set_I";
+      tmp_code->sr1 = sr1;
+      tmp_code->dst = dst;
+      mytab.ctl_idx++;
+      break;
+    }
+  */
+
+  //mytab.ctl_idx++;
+}
+void midCodeFunc::gen_mid_code(string op,symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
+cout<<"%%%%%%%%%%^^^^^^^ 3 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
+  midCode* tmp_code = new midCode;
+  symbolTab* s1 = new symbolTab;
+  symbolTab* s2 = new symbolTab;
+  symbolTab* d = new symbolTab;
+  mytab.ctab[mytab.ctl_idx] = tmp_code;
 
 
+  s1->name = sr1->name;
+  s1->cat = sr1->cat;
+  s1->typ = sr1->typ;
+  s1->ref = sr1->ref;
+
+  s2->name = sr2->name;
+  s2->cat = sr2->cat;
+  s2->typ = sr2->typ;
+  s2->ref = sr2->ref;
+
+  d->name = dst->name;
+  d->cat = dst->cat;
+  d->typ = dst->typ;
+  d->ref = dst->ref;
+
+  tmp_code->op = op;
+  tmp_code->sr1 = s1;
+  tmp_code->sr2 = s2;
+  tmp_code->dst = d;
+  tmp_code->typ = 3;
+  mytab.ctl_idx++;
+  /*
+  switch(op):
+    case "get_array":{
+      tmp_code->op = "get_array";
+      tmp_code->sr1 = sr1;
+      tmp_code->sr2 = sr2;
+      tmp_code->dst = dst;
+      mytab.ctl_idx++;
+      break;
+    }
+    case "times":{
+      tmp_code->op = "times";
+      tmp_code->sr1 = sr1;
+      tmp_code->sr2 = sr2;
+      tmp_code->dst = dst;
+      mytab.ctl_idx++;
+      break;
+    }
+    //mytab.ctl_idx++;
+  */
+}

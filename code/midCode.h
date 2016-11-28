@@ -7,33 +7,43 @@
 #include "syntax.h"
 #include "block.h"
 #include "tables.h"
+#include "add.h"
+
+extern class tables mytab;
 
 using namespace std;
 
-typedef struct midcd{
-    symbolTab* sr1;
-    symbolTab* sr2;
-    symbolTab* dst;
-    string op;
-}midCode;
 
-void print_midCode(midCode cd); // ´òÓ¡ËÄÔªÊ½
-
-symbolTab* genTmpVar();//²úÉúÒ»¸öÐÂµÄÖÐ¼ä±äÁ¿
-
-int codeTpy(string op); //ÅÐ¶ÏËÄÔªÊ½·ûºÅÀàÐÍ
+//void print_midCode(midCode cd); // ï¿½ï¿½Ó¡ï¿½ï¿½ÔªÊ½
+//int codeTpy(string op); //ï¿½Ð¶ï¿½ï¿½ï¿½ÔªÊ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
 
-class genTmpName{ // ²úÉústringÀàÐÍµÄÖÐ¼ä±äÁ¿Ãû×Ö
+class genTmpVar{ // ï¿½ï¿½ï¿½ï¿½stringï¿½ï¿½ï¿½Íµï¿½ï¿½Ð¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     public:
     string nameHead = "@temp";
     int num;
-    genTmpName();
+    genTmpVar();
     string getName();
+    void getTmpVar(symbolTab* tmp);
 };
 
-class genTmpVar{
-    symbolTab a; // to fix!!
+class genLabel { // ï¿½ï¿½ï¿½ï¿½stringï¿½ï¿½ï¿½Íµï¿½ï¿½Ð¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    public:
+    string nameHead = "$label";
+    int num;
+    genLabel();
+    string getName();
+    void getLabel(symbolTab* lab);
 };
+
+class midCodeFunc{
+public:
+  int a;
+  midCodeFunc();
+  void gen_mid_code(string op,symbolTab* sr1,symbolTab* sr2,symbolTab* dst);
+  void gen_mid_code(string op,symbolTab* sr1,symbolTab* dst);
+  void gen_mid_code(string op,symbolTab* sr1);
+};
+
 #endif // MIDCODE_H

@@ -59,23 +59,27 @@ class block{
       void condition();//条件
       int islogic(string s);//是否类型为逻辑比较符
 
-      void becomeSent();//赋值语句
+      void becomeSent(symbolTab* tmp);//赋值语句
 
-      void expression();//表达式
-      void term();//项
-      void factor();//因子
+      void expression(symbolTab* ret);//表达式
+      void term(symbolTab* ret);//项
+      void factor(symbolTab* ret);//因子
 
-      void callRet();//有返回值的函数调用
+      void callRet(symbolTab* func,symbolTab* ret);//有返回值的函数调用
       void callVoid();//无返回值的函数调用
 
       void valList();//值参数表
       block();
       void errormsg(string s,string token);
       void callSent();
-      symbolTab* checkST(string name, string funcName); //根据函数名称查name的符号
+
 
       void showGlob();
       void showMainLocal();
+
+      void check_sbl(string funcName, string name,symbolTab* ret);//根据函数名称查name的符号
+
+      int check_array(symbolTab* sr1);// insure is an array
 
 };
 # endif
