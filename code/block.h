@@ -56,7 +56,7 @@ class block{
       void whileSent();//while 语句
       void forSent();//for 语句
       void conditionSent();//条件语句
-      void condition();//条件
+      void condition(symbolTab*label);//条件 condition(symbolTab*label)
       int islogic(string s);//是否类型为逻辑比较符
 
       void becomeSent(symbolTab* tmp);//赋值语句

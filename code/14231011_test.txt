@@ -34,6 +34,6 @@ void main(){
     else{
       b1=0;
     }
-  }while(0)
+  }while((aaa*3+1)>b)
 aaa = 3+func1(1,2+2*(3+7))*aaa;
 }

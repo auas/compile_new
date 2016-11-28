@@ -610,6 +610,9 @@ void block::statement(){
 
 void block::whileSent(){
   cout<<"there is a while cycle"<<endl;
+  symbolTab* lab = new symbolTab;
+  genLb.getLabel(lab);
+  mdF.gen_mid_code("set_lab",lab);
   sent();
   if(syn.typ!="whilesym"){
     errormsg("no while in do while",syn.tmp_token);
@@ -621,7 +624,7 @@ void block::whileSent(){
     }
     else {
       syn.get_token();
-      condition();
+      condition(lab);
       if(syn.typ!="rparen"){
         errormsg("no rparen in while",syn.tmp_token);
       }
@@ -635,6 +638,18 @@ void block::whileSent(){
 void block::forSent(){
   //for‘(’＜标识符＞＝＜表达式＞;＜条件＞;＜标识符＞＝＜标识符＞(+|-)＜步长＞‘)’＜语句＞
   //当前应为 ‘（’
+  symbolTab* lab1 = new symbolTab;
+  genLb.getLabel(lab1);
+
+  symbolTab* lab2 = new symbolTab;
+  genLb.getLabel(lab2);
+
+  symbolTab* lab3 = new symbolTab;
+  genLb.getLabel(lab3);
+
+  symbolTab* lab4 = new symbolTab;
+  genLb.getLabel(lab4);
+
   if(syn.typ!="lparen"){
     errormsg("no lparen! in for",syn.tmp_token);
   }
@@ -657,8 +672,11 @@ void block::forSent(){
           errormsg("for p1 no endcmd",syn.tmp_token);
         }
         else{
+          mdF.gen_mid_code("set_lab",lab4);
           syn.get_token();
-          condition();
+          condition(lab2);
+          mdF.gen_mid_code("goto",lab1);
+          mdF.gen_mid_code("set_lab",lab3);
           if(syn.typ!="endcmd"){
             errormsg("for p2 no endcmd",syn.tmp_token);
           }
@@ -699,8 +717,12 @@ void block::forSent(){
                             errormsg("for p3 no rparen",syn.tmp_token);
                           }
                           else{
+                            mdF.gen_mid_code("goto",lab4);
+                            mdF.gen_mid_code("set_lab",lab2);
                             syn.get_token();
                             sent();
+                            mdF.gen_mid_code("goto",lab3);
+                            mdF.gen_mid_code("set_lab",lab1);
                           }
                         }
                       }
@@ -815,18 +837,45 @@ int block::islogic(string s){
 
 }
 
-void block::condition(){
+void block::condition(symbolTab*label){
   //＜条件＞    ::=  ＜表达式＞＜关系运算符＞＜表达式＞｜＜表达式＞
   cout<<"there is a condition"<<endl;
   symbolTab* tmp1 = new symbolTab;
   expression(tmp1);
   //cout<<"&&&&&&&&&&"<<syn.typ<<endl;
   if(islogic(syn.typ)){
+    string save = syn.typ;
     //cout<<"&&&&&&&&&&"<<syn.typ<<endl;
     syn.get_token();
     //cout<<"&&&&&&&&&&"<<syn.typ<<endl;
     symbolTab* tmp2 = new symbolTab;
     expression(tmp2);
+    if(save=="lss"){
+      mdF.gen_mid_code("blss",tmp1,tmp2,label);
+    }
+    else if(save=="ngtr"){
+      mdF.gen_mid_code("bngtr",tmp1,tmp2,label);
+    }
+    else if(save=="nlss"){
+      mdF.gen_mid_code("bnlss",tmp1,tmp2,label);
+    }
+    else if(save=="gtr"){
+      mdF.gen_mid_code("bgtr",tmp1,tmp2,label);
+    }
+    else if(save=="eql"){
+      mdF.gen_mid_code("beq",tmp1,tmp2,label);
+    }
+    else if(save=="neql"){
+      mdF.gen_mid_code("bneq",tmp1,tmp2,label);
+    }
+    else {
+      cout<<"undef: logistic"<<endl;
+    }
+
+    return;
+  }
+  else{
+    mdF.gen_mid_code("bnez",tmp1,label);
     return;
   }
 }
@@ -837,14 +886,22 @@ void block::conditionSent(){
     errormsg("conditionSent lose lparen",syn.tmp_token);
   }
   else{
+    symbolTab* lab1 = new symbolTab;
+    genLb.getLabel(lab1);
+    symbolTab* lab2 = new symbolTab;
+    genLb.getLabel(lab2);
+
     syn.get_token();
-    condition();
+    condition(lab1);
+    mdF.gen_mid_code("goto",lab2);
+    mdF.gen_mid_code("set_lab",lab1);
     if(syn.typ!="rparen"){
       errormsg("conditionSent lose rparen",syn.tmp_token);
     }
     else{
       syn.get_token();
       sent();
+      mdF.gen_mid_code("set_lab",lab2);
       if(syn.typ!="elsesym"){
         return;
       }

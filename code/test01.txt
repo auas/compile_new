@@ -24,4 +24,12 @@ void main(){
   int c[10];
   aaa = 3+func1(1,2+2*(3+7))*aaa;
   c[aaa] = aaa;
+  do{
+    if(g1>0){
+      b = c+1;
+    }
+    else{
+      b=0;
+    }
+  }while((aaa*3+1)>b)
 }
