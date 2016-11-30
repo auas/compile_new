@@ -1,0 +1,97 @@
+.data
+!str0: .asciiz "sdfsd"
+!str1: .asciiz "sdfsd"
+.text
+	li $s7,0x10040000
+	move $fp,$sp
+	jal main
+	j end
+func1:
+	sw $sp,4($sp)
+	sw $ra,0($sp)
+	addi $sp,$sp,-48
+	li $t0,1
+	sw $t0,4($sp)
+	li $t0,2
+	sw $t0,8($sp)
+	lw $t0,0($sp)
+	lw $t1,8($sp)
+	mult $t0,$t1
+	sw LO,8($sp)
+	lw $t0,1953391721($sp)
+	lw $t1,8($sp)
+	mult $t0,$t1
+	sw LO,8($sp)
+	lw $t0,4($sp)
+	sw $t0,88($gb)
+	li $t0,1
+	sw $t0,12($sp)
+	lw $t0,12($sp)
+	sw $t0,88($gb)
+$label3:
+	li $t0,100
+	sw $t0,16($sp)
+	 j $label0
+$label2:
+	 j $label3
+$label1:
+	 j $label2
+$label0:
+	lw $v1,0($sp)
+	lw $sp,44($sp)
+	jr $ra
+func2:
+	sw $sp,4($sp)
+	sw $ra,0($sp)
+	addi $sp,$sp,-28
+	lw $sp,24($sp)
+	jr $ra
+main:
+	sw $sp,4($sp)
+	sw $ra,0($sp)
+	addi $sp,$sp,-100
+	li $t0,1
+	sw $t0,4($sp)
+	lw $t0,4($sp)
+	sw $t0,84($sp)
+$label7:
+	li $t0,100
+	sw $t0,8($sp)
+	 j $label4
+$label6:
+	 j $label7
+$label5:
+	 j $label6
+$label4:
+	li $t0,1
+	sw $t0,12($sp)
+	lw $t0,12($sp)
+	sw $t0,-12($sp)
+	li $t0,2
+	sw $t0,16($sp)
+	lw $t0,16($sp)
+	sw $t0,-16($sp)
+	jal func1
+	sw $v1,0($sp)
+$label8:
+	li $t0,0
+	sw $t0,20($sp)
+	 j $label10
+$label9:
+	li $t0,1
+	sw $t0,24($sp)
+	lw $t0,1660957031($sp)
+	sw $t0,80($sp)
+$label10:
+	li $t0,0
+	sw $t0,28($sp)
+	lw $t0,28($sp)
+	sw $t0,80($sp)
+	li $t0,3
+	sw $t0,32($sp)
+	lw $t0,32($sp)
+	lw $t1,1818847351($sp)
+	mult $t0,$t1
+	sw LO,1818847351($sp)
+	li $t0,1
+	sw $t0,36($sp)

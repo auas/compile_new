@@ -41,10 +41,10 @@ void block::expression(symbolTab* tmp){
   while(syn.typ=="plus"||syn.typ=="minus"){
     string op = syn.typ;
     syn.get_token();
-    symbolTab sr1;
-    term(&sr1);
+    symbolTab* sr1 = new symbolTab;
+    term(sr1);
     //string op;
-    mdF.gen_mid_code(op,&sr1,tmp,tmp);
+    mdF.gen_mid_code(op,sr1,tmp,tmp);
   }
 
 }//表达式
@@ -54,9 +54,9 @@ void block::term(symbolTab* tmp){
   while(syn.typ=="times"||syn.typ=="slash"){
     string s = syn.typ;
     syn.get_token();
-    symbolTab sr1;
-    factor(&sr1);
-    mdF.gen_mid_code(s,&sr1,tmp,tmp);
+    symbolTab* sr1 = new symbolTab;
+    factor(sr1);
+    mdF.gen_mid_code(s,sr1,tmp,tmp);
   }
   cout<<"there is a term"<<endl;
 }//项
@@ -65,14 +65,14 @@ void block::factor(symbolTab* tmp){ // !!unfinished!!
   if(syn.typ=="numsym"){//more to check symble table!
     //cout<<"#######   "<<syn.tmp_token<<endl;
     genTmp.getTmpVar(tmp); //!!!!!!!!!!!!!!!!!!!!! TO CHECK!!
-    symbolTab sr1;
-    sr1.name = syn.tmp_token;
-    //sr1.typ = ??
+    symbolTab* sr1 = new symbolTab;
+    sr1->name = syn.tmp_token;
+    sr1->typ = 5;
     //cout<<"%%%%%%%^^^^^^^^^^^^^^^%%%%%  "<<dst->name<<endl;
     //while(1);
     //cout<<"###############   "<<tmp->name.c_str()<<endl;
-    string op_1((char*)("set_I"));
-    mdF.gen_mid_code(op_1,&sr1,tmp);
+    //string op_1((char*)("set_I"));
+    mdF.gen_mid_code("set_I",sr1,tmp);
     syn.get_token();
     return;
     //while(1);
@@ -83,14 +83,14 @@ void block::factor(symbolTab* tmp){ // !!unfinished!!
 
     //cout<<"#######    "<<syn.tmp_token<<endl;
     genTmp.getTmpVar(tmp);
-    symbolTab sr1;
-    sr1.name = syn.tmp_token;
-    //sr1.typ = ??
+    symbolTab* sr1 = new symbolTab;
+    sr1->name = syn.tmp_token;
+    sr1->typ = 5;
     //cout<<"%%%%%%%^^^^^^^^^^^^^^^%%%%%  "<<dst->name<<endl;
     //while(1);
     //cout<<"###############   "<<tmp->name.c_str()<<endl;
-    string op = "set_I";
-    mdF.gen_mid_code(op,&sr1,tmp);
+    //string op = "set_I";
+    mdF.gen_mid_code("set_I",sr1,tmp);
     syn.get_token();
     //while(1);
     //cout<<"#######   "<<syn.tmp_token<<endl;
@@ -114,9 +114,10 @@ void block::factor(symbolTab* tmp){ // !!unfinished!!
       syn.get_token();
       if(syn.typ=="lsquare"){
         syn.get_token();
-        symbolTab* sr1 = new symbolTab;
+        //symbolTab* sr1 = new symbolTab;
+        symbolTab* sr1;
         //sr1 = check_sbl(funcName, name);
-        check_sbl(funcName,name,sr1);
+        sr1 = check_sbl(funcName,name);
         check_array(sr1); // insure is an array
         symbolTab* sr2 = new symbolTab;
         expression(sr2);
@@ -136,9 +137,10 @@ void block::factor(symbolTab* tmp){ // !!unfinished!!
         // chack if callable and with return value
         //bool cq = mytab.isReFunc(name);
         //if (cq==0)
-        symbolTab* tmp1 = new symbolTab;
+        //symbolTab* tmp1 = new symbolTab;
+        symbolTab* tmp1;
         //mytab.cheq_stab(name,&tmp1);
-        check_sbl(funcName,name,tmp1);
+        tmp1 = check_sbl(name);
 
         if((tmp1->name=="#null")||(tmp1->cat!=5)){
             cout<<tmp1->cat<<endl;
@@ -162,11 +164,13 @@ void block::factor(symbolTab* tmp){ // !!unfinished!!
       else{
           //syn.get_token();
           //symbolTab* check_sbl(string funcName, string name);//根据函数名称查name的符号
-          genTmp.getTmpVar(tmp);
-          symbolTab* sr1 = new symbolTab;
-          check_sbl(funcName, name,sr1);
-          string op = "load";
-          mdF.gen_mid_code(op,sr1,tmp);
+
+          //genTmp.getTmpVar(tmp);
+          symbolTab* sr1;
+          sr1 = check_sbl(funcName, name);
+          //string op = "load";
+          //mdF.gen_mid_code(op,sr1,tmp);
+          tmp = sr1;
           return;
       }
     }
@@ -280,6 +284,8 @@ void block::constDef(){
 void block::var(){
   //＜变量说明＞  ::= ＜变量定义＞;{＜变量定义＞;}
   do{
+    if(syn.typ=="endcmd")
+      syn.get_token();
     varDef();
   }while(syn.typ=="endcmd");
   cout<<"there is a var def"<<endl;
@@ -365,6 +371,7 @@ void block::clamHead(){
 
 void block::funcs(){
   if(syn.typ=="lparen"){
+    //syn.get_token();
     retFunc();
   }
   do{
@@ -418,6 +425,7 @@ void block::paraList(){
   //＜参数表＞    ::=  ＜类型标识符＞＜标识符＞{,＜类型标识符＞＜标识符＞}| ＜空＞
   if(syn.typ=="rparen"){
     //enter btab !!!!!
+    syn.get_token();
     return;
   }
   startP1 = 0;
@@ -489,21 +497,23 @@ void block::retFunc(){
     }
     tmp_btl_idx = mytab.enterReFun(1,name,Typ);
     funcName = name; // 全局记录当前分析到的函数
+    //symbolTab* func = new symbolTab;
+    symbolTab* func;
+    func = check_sbl(name);
+    mdF.gen_mid_code("set_func_Lab",func);
+
     func_start_stab_indx =  mytab.getSbl_idx();// 没有偏移！
 
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     cout<<"retfunc:  "<<name<<" type: "<<Typ<<endl;
     syn.get_token();
     paraList();
-    if(syn.typ!="lbrace"){
-      cout<<"error!:func no lbrace  "<<syn.tmp_token<<endl;
-      while(1);
-    }
-    else{
+
+    {
       func_pare_stab_indx = mytab.getSbl_idx(); //偏移+1
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-      syn.get_token();
-      cout<<"$$$  "<<syn.tmp_token<<endl;
+      //syn.get_token();
+      //cout<<"$$$  "<<syn.tmp_token<<endl;
       if(syn.typ=="rbrace"){
         cout<<"error! no ret for retfunc!"<<endl;
       }
@@ -511,6 +521,7 @@ void block::retFunc(){
       int p1_num = func_pare_stab_indx - func_start_stab_indx; //形参个数
       mytab.enterFun(2,funcName,func_start_stab_indx,p1_num);
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      syn.get_token();
       statement();
       if(syn.typ!="rbrace"){
         cout<<"error!:func no rbrace "<<syn.tmp_token<<endl;
@@ -520,13 +531,19 @@ void block::retFunc(){
 
         func_local_stab_indx = mytab.getSbl_idx(); // 偏移+1
         p2_num = func_local_stab_indx - func_pare_stab_indx;
-        mytab.enterFun(3,funcName,func_local_stab_indx-1,p2_num,0); //fix c_addr!
+
+        int num_tmp = genTmp.resetTmp();
+        int tmp_k = num_tmp+3; // 3=ra+sp+pad
+        mytab.enterFun(3,funcName,func_local_stab_indx-1,p2_num,tmp_k); //fix c_addr!
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        mytab.cal_addr(funcName);
         syn.get_token();
       }
     }
+    mdF.gen_mid_code("finish_func",func);
   }
   functyp=-1;//reset!
+
 }//有返回值的函数定义
 
 void block::voidFunc(){
@@ -545,6 +562,11 @@ void block::voidFunc(){
     tmp_btl_idx = mytab.enterVdFun(1,name);
     funcName = name; // 全局记录当前分析到的函数
     func_start_stab_indx =  mytab.getSbl_idx();// 没有偏移！
+
+    //symbolTab* func = new symbolTab;
+    symbolTab* func;
+    func = check_sbl(name);
+    mdF.gen_mid_code("set_func_Lab",func);
 
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
@@ -578,13 +600,19 @@ void block::voidFunc(){
 
         func_local_stab_indx = mytab.getSbl_idx(); // 偏移+1
         p2_num = func_local_stab_indx - func_pare_stab_indx;
-        mytab.enterFun(3,funcName,func_local_stab_indx-1,p2_num,0); //fix c_addr!
+
+        int num_tmp = genTmp.resetTmp();
+        int tmp_k = num_tmp+3; // 3=ra+sp+pad
+        mytab.enterFun(3,funcName,func_local_stab_indx-1,p2_num,tmp_k); //fix c_addr!
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        mytab.cal_addr(funcName);
         syn.get_token();
       }
     }
+    mdF.gen_mid_code("finish_func",func);
   }
   functyp = -1;
+
 }//无返回值函数定义
 
 
@@ -660,6 +688,10 @@ void block::forSent(){
     }
     else{
       // To Do !! lookup tables!!!
+      //symbolTab* sr1 = new symbolTab;
+      symbolTab* sr1;
+      sr1 = check_sbl(funcName,syn.tmp_token);
+
       syn.get_token();
       if(syn.typ!="become"){
         errormsg("for pl one no become!",syn.tmp_token);
@@ -668,6 +700,7 @@ void block::forSent(){
         syn.get_token();
         symbolTab* tmp=new symbolTab;
         expression(tmp);
+        mdF.gen_mid_code("set",sr1,tmp);
         if(syn.typ!="endcmd"){
           errormsg("for p1 no endcmd",syn.tmp_token);
         }
@@ -747,14 +780,36 @@ void block::readSent(){
     }
     else{
       //lookup tables!
+      //cout<<"111"<<endl;
+      //symbolTab* sr1 = new symbolTab;
+      symbolTab* sr1;
+      //cout<<"111"<<endl;
+      sr1 = check_sbl(funcName,syn.tmp_token);
+      //cout<<"111"<<endl;
+      mdF.gen_mid_code("read",sr1);
+      //cout<<"111"<<endl;
+
       syn.get_token();
+      //cout<<"111"<<endl;
       while(syn.typ=="comma"){
+        //cout<<"222"<<endl;
+
         syn.get_token();
         if(syn.typ!="idnt"){
           errormsg("readSent ill idnt",syn.tmp_token);
         }
         else{
+          //cout<<"222"<<endl;
           //lookup tables!!
+          //symbolTab* sr1 = new symbolTab;
+          symbolTab* sr1;
+          cout<<funcName.c_str()<<endl;
+          cout<<syn.tmp_token<<endl;
+          sr1 = check_sbl(funcName,syn.tmp_token);
+          cout<<sr1->name.c_str()<<endl;
+          cout<<funcName.c_str()<<endl;
+          mdF.gen_mid_code("read",sr1);
+          cout<<"222"<<endl;
           syn.get_token();
         }
       }
@@ -775,11 +830,15 @@ void block::writeSent(){
   else{
     syn.get_token();
     if(syn.typ=="strsym"){
+      symbolTab* str = new symbolTab;
+      set_str(str);
+      mdF.gen_mid_code("write_str",str);
       syn.get_token();
       if(syn.typ=="comma"){
         syn.get_token();
         symbolTab* tmp = new symbolTab;
         expression(tmp);
+        mdF.gen_mid_code("write_exp",tmp);
         if(syn.typ!="rparen"){
           errormsg("writeSent lose rpare $",syn.tmp_token);
         }
@@ -801,6 +860,7 @@ void block::writeSent(){
     else{
       symbolTab* tmp = new symbolTab;
       expression(tmp);
+      mdF.gen_mid_code("write_exp",tmp);
       if(syn.typ!="rparen"){
         errormsg("writeSent lose rpare $",syn.tmp_token);
       }
@@ -969,10 +1029,34 @@ int block::sent(){
   }
   else if(syn.typ=="returnsym"){
     cout<<"there is a return stat"<<endl;
-    while(syn.typ!="endcmd") // to fix
-      syn.get_token();
     syn.get_token();
-    return 1;
+    if(syn.typ=="lparen"){
+      syn.get_token();
+      symbolTab* ret  = new symbolTab;
+      expression(ret);
+      if(syn.typ!="rparen"){
+        errormsg("lose rparen in return",syn.tmp_token);
+      }
+      else{
+        mdF.gen_mid_code("return",ret);
+        syn.get_token();
+        if(syn.typ!="endcmd"){
+          errormsg("losing endcmd",syn.tmp_token);
+        }
+        else{
+          syn.get_token();
+          return 1;
+        }
+      }
+    }
+    else{
+      while(syn.typ!="endcmd") // to fix
+        syn.get_token();
+      syn.get_token();
+      mdF.gen_mid_code("returnNull");
+      return 1;
+    }
+
   }
   else if(syn.typ=="lbrace"){
     syn.get_token();
@@ -993,11 +1077,14 @@ int block::sent(){
   }
   else if(syn.typ=="idnt"){
     //check table
-    name = syn.tmp_token; // save for use
+    string Sname = syn.tmp_token; // save for use
+    name = Sname;
+    cout<<"in idnt sent &&**(())  "<<name.c_str()<<endl;
     syn.get_token();
     if(syn.typ=="lsquare"){
-      symbolTab* sr1 = new symbolTab;
-      check_sbl(funcName,name,sr1);
+      //symbolTab* sr1 = new symbolTab;
+      symbolTab* sr1;
+      sr1 = check_sbl(funcName,Sname);
       check_array(sr1);
       symbolTab* sr2 = new symbolTab;
       syn.get_token();
@@ -1028,9 +1115,11 @@ int block::sent(){
     else if(syn.typ=="become"){
       syn.get_token();
       symbolTab* tmp = new symbolTab;
-      symbolTab* sr1 = new symbolTab;
+    //  symbolTab* sr1 = new symbolTab;
+      symbolTab* sr1;
       becomeSent(tmp);
-      check_sbl(funcName,name,sr1);
+      cout<<"attention  "<<Sname.c_str()<<endl;
+      sr1 = check_sbl(funcName,Sname);
       mdF.gen_mid_code("set",sr1,tmp);
       if(syn.typ!="endcmd"){
         errormsg("lose endcmd for becomeSent",syn.tmp_token);
@@ -1044,32 +1133,10 @@ int block::sent(){
       //errormsg("maybe func to fix!",syn.tmp_token);
       //cout<<"可能是函数调用或赋值语句，待解决"<<endl;
       cout<<"there is a func calling"<<endl;
-      mytab.isReFunc(name);
-      mytab.isVdFunc(name);
+      mytab.isReFunc(Sname);
+      mytab.isVdFunc(Sname);
       //syn.get_token();
       callSent();// 从 (开始分析！
-
-/*
-symbolTab tmp1;
-mytab.cheq_stab(name,&tmp1);
-if((tmp1.name=="#null")||((tmp1.cat!=5)&&(tmp1.cat!=6)))
-  errormsg("no def func calling ! to fix",name);
-else{
-  syn.get_token();
-  callRet(&tmp1,tmp);
-  if (syn.typ!="rparen"){
-    errormsg("losing rparen in func calling",syn.tmp_token);
-  }
-  else{
-    cout<<"auas is there!"<<endl;
-    syn.get_token();
-    return;
-  }
-*/
-
-
-
-
 
       if(syn.typ!="endcmd"){
         cout<<"lose endcmd"<<endl;
@@ -1087,6 +1154,7 @@ else{
 
 void block::mainFunc(){
   functyp = 3;
+  //funcName = "main";
   if(syn.typ!="lparen"){
     cout<<"no {: "<<syn.tmp_token<<endl;
   }
@@ -1116,12 +1184,31 @@ void block::mainFunc(){
   if(funcName =="start"){
       glob_stab_end_indx = mytab.getSbl_idx(); // 偏移+1
     }
+  int func_start_stab_indx =  mytab.getSbl_idx(); // no偏移
   funcName = "main";
   tmp_btl_idx = mytab.enterVdFun(1,"main");
+
+  //symbolTab* func = new symbolTab;
+    symbolTab* func;
+    func = check_sbl(funcName);
+    mdF.gen_mid_code("set_func_Lab",func);
+
+  int p1_num = 0;
+  mytab.enterFun(2,funcName,func_start_stab_indx,p1_num);
+
 
   main_start_stab_indx = mytab.getSbl_idx();//main函数第一个变量在符号表中的位置，直接指向，没有偏移
 
   statement();
+  int func_local_stab_indx = mytab.getSbl_idx(); // 偏移+1
+  int func_pare_stab_indx = func_start_stab_indx;
+  p2_num = func_local_stab_indx - func_pare_stab_indx;
+
+  int num_tmp = genTmp.resetTmp();
+  int tmp_k = num_tmp+3; // 3=ra+sp+pad
+
+  mytab.enterFun(3,funcName,func_local_stab_indx-1,p2_num,tmp_k);
+  mytab.cal_addr("main");
   end_all_stab_indx = mytab.getSbl_idx();
     cout<<"finish main!"<<endl;
 }
@@ -1139,26 +1226,56 @@ void block::becomeSent(symbolTab* tmp){
 }
 
 void block::callSent(){
+  //symbolTab* tmp1 = new symbolTab;
+  symbolTab* tmp1;
+        //mytab.cheq_stab(name,&tmp1);
+  tmp1 = check_sbl(name);
+
+  if((tmp1->name=="#null")||((tmp1->cat!=5)&&tmp1->cat!=6)){
+      cout<<tmp1->cat<<endl;
+      errormsg("no def func calling ! to fix",tmp1->name);
+  }
+
+
   if(syn.typ!="lparen"){
     errormsg("lose lparen!",syn.tmp_token);
   }
   else{
     syn.get_token();
-    symbolTab* tmp = new symbolTab;
-    expression(tmp);
-    while(syn.typ=="comma"){
-      //lookup
-      syn.get_token();
+    if(syn.typ!="rparen"){
       symbolTab* tmp = new symbolTab;
       expression(tmp);
+
+      symbolTab* tmp2 = new symbolTab;
+      tmp2->name="@@para";
+      tmp2->ref = 4;
+
+      mdF.gen_mid_code("add_para",tmp,tmp2);
+      int itt = 1;
+      while(syn.typ=="comma"){
+        //lookup
+        itt++;
+        syn.get_token();
+        tmp = new symbolTab;
+        expression(tmp);
+
+        tmp2 = new symbolTab;
+        tmp2->name="@@para";
+        tmp2->ref = itt*4;
+
+        mdF.gen_mid_code("add_para",tmp,tmp2);
+      }
+      if(syn.typ!="rparen"){
+        errormsg("lose rparen",syn.tmp_token);
+      }
+
     }
-    if(syn.typ!="rparen"){
-      errormsg("lose rparen",syn.tmp_token);
-    }
-    else{
-      syn.get_token();
-    }
+    mdF.gen_mid_code("begin_func",tmp1);
+    symbolTab* tmp2 = new symbolTab;
+    mdF.gen_mid_code("end_func",tmp1,tmp2);//no use tmp2
+    syn.get_token();
   }
+
 }
 
 
@@ -1171,60 +1288,93 @@ void block::showMainLocal(){
   mytab.showStab(main_start_stab_indx,end_all_stab_indx);
 }
 
-void block::check_sbl(string funcName, string name,symbolTab *tmp){
+symbolTab* block::check_sbl(string funcName, string name){
   int cat,typ,ref;
+  symbolTab* rett;
   bool cq = mytab.isThere(funcName,0,mytab.sbl_idx,&cat,&typ,&ref);
   if (cq&&(cat==5||cat==6)){
     blockTab tmp1 = mytab.btab[ref];
     int low = tmp1.p1_addr;
     //int high = tmp.p2_addr; // not in yet!
     int high = mytab.sbl_idx;
-    mytab.cheq_stab(name,low-1,high-1,tmp); //check local
-    if(tmp->name=="#null"){
-      mytab.cheq_stab(name,-1,glob_stab_end_indx-1,tmp); //check globe
-      if(tmp->name=="#null"){
+    rett = mytab.cheq_stab(name,low-1,high-1); //check local
+    if(rett->name=="#null"){
+      rett = mytab.cheq_stab(name,-1,glob_stab_end_indx-1); //check globe
+      if(rett->name=="#null"){
+        cout<<"in"<<endl;
+        cout<<"^^^^^^"<<glob_stab_end_indx<<endl;
+        cout<<"&&&&&&&&&&&&"<<endl;
+        mytab.showStab(0,glob_stab_end_indx);
         mytab.showStab(low,high);
-        errormsg("can't find "+name," in func: "+funcName);
+        while(1);
+        errormsg("aaa can't find "+name," in func: "+funcName);
       }
       else
-        return ;
+        return rett;
     }
     else
-      return ;
+      return rett;
   }
   else
-    errormsg("can't find func named",funcName);
+    errormsg("b can't find func named",funcName);
+}
+
+symbolTab* block::check_sbl(string name){
+  int cat,typ,ref;
+  symbolTab* rett;
+  int cq = mytab.isThere(name,0,mytab.sbl_idx,&cat,&typ,&ref,1);
+  if ((cq!=-1)&&(cat==5||cat==6)){
+    rett= &mytab.stab[cq];
+    return rett;
+  }
+  else
+    errormsg(" can't find func named",name);
 }
 
 
 void block::callRet(symbolTab* func,symbolTab* tmp){
-
+  syn.get_token();
   if(syn.typ=="rparen"){
-    string op = "begin_func";
-    mdF.gen_mid_code(op,func);
+    mdF.gen_mid_code("begin_func",func);
   }
   else{
+
+    symbolTab* tmp2 = new symbolTab;
+    tmp2->name="@@para";
+    tmp2->ref = 4;
+
     symbolTab* tmp1 = new symbolTab;
     expression(tmp1);
+    mdF.gen_mid_code("add_para",tmp1,tmp2);
+
+
+    int itt = 1;
     while(syn.typ=="comma"){
-      string op = "add_para";
-      mdF.gen_mid_code(op,tmp1);
+      itt++;
+
+      symbolTab* tmp2 = new symbolTab;
+      tmp2->name="@@para";
+      tmp2->ref = 4*itt;
+
       symbolTab* tmp1 = new symbolTab;
       syn.get_token();
       expression(tmp1);
+      mdF.gen_mid_code("add_para",tmp1,tmp2);
     }
-    string op = "add_para";
-    mdF.gen_mid_code(op,tmp1);
-    op = "begin_func";
-    mdF.gen_mid_code(op,func);
+
+    mdF.gen_mid_code("begin_func",func);
+    genTmp.getTmpVar(tmp);
+    mdF.gen_mid_code("end_func",func,tmp);
   }
-  string op = "end_func";
-  genTmp.getTmpVar(tmp);
-  mdF.gen_mid_code(op,func,tmp);
 
 }
 
 int block::check_array(symbolTab* sr1)// insure is an array
 {
   return sr1->cat == 3;
+}
+void block::set_str(symbolTab* str){
+  str->name = syn.tmp_token;
+  str->cat = 4;
+  mytab.addstr(syn.tmp_token);
 }

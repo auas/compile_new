@@ -1,0 +1,6 @@
+.data
+!str0: .asciiz "sdfsd"
+!str1: .asciiz "sdfsd"
+.text
+	li $s7,0x10040000
+ok

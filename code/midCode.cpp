@@ -21,8 +21,14 @@ void genTmpVar::getTmpVar(symbolTab* tmp){ //Ĭ��Ϊint ���͵ı���
     tmp->name = name;
     //cout<<"%%&&^^%%"<<name<<endl;
     tmp->cat = 2;
-    tmp->typ = 1;
+    tmp->typ = 3;
     tmp->ref = 0;
+    tmp->addr = (num)*4;//record it's addr!
+}
+int genTmpVar::resetTmp(){
+  int ret = num;
+  num = 0;
+  return ret;
 }
 
 genLabel::genLabel(){
@@ -42,7 +48,7 @@ void genLabel::getLabel(symbolTab* tmp){
   string name = getName();
   tmp->name = name;
   tmp->cat = 0;
-  tmp->typ = 0;
+  tmp->typ = 5;
   tmp->ref = 0;
 }
 
@@ -56,19 +62,27 @@ int codeTpy(string op){
 midCodeFunc::midCodeFunc(){
   a = 0;
 }
-void midCodeFunc::gen_mid_code(string op,symbolTab* sr1){
-  cout<<"%%%%%%%%%%^^^^^^^ 1 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
+
+void midCodeFunc::gen_mid_code(string op){
+  cout<<"%%%%%%%%%%^^^^^^^ 0 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
   midCode* tmp_code = new midCode;
   symbolTab* s1 = new symbolTab;
   mytab.ctab[mytab.ctl_idx] = tmp_code;
   tmp_code->op = op;
+  tmp_code->typ = 0;
+  mytab.ctl_idx++;
 
-  s1->name = sr1->name;
-  s1->cat = 0;//sr1->cat;
-  s1->typ = sr1->typ;
-  s1->ref = sr1->ref;
+}
 
-  tmp_code->sr1 = s1;
+
+void midCodeFunc::gen_mid_code(string op,symbolTab* sr1){
+  cout<<"%%%%%%%%%%^^^^^^^ 1 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
+  midCode* tmp_code = new midCode;
+  mytab.ctab[mytab.ctl_idx] = tmp_code;
+  tmp_code->op = op;
+
+
+  tmp_code->sr1 = sr1;
   tmp_code->typ = 1;
   mytab.ctl_idx++;
 
@@ -77,20 +91,10 @@ void midCodeFunc::gen_mid_code(string op,symbolTab* sr1,symbolTab* sr2){
 cout<<"%%%%%%%%%%^^^^^^^ 2 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
   cout<<"hahahah"<<endl;
   midCode* tmp_code = new midCode;
-  symbolTab* s1 = new symbolTab;
-  symbolTab* s2 = new symbolTab;
   mytab.ctab[mytab.ctl_idx] = tmp_code;
   tmp_code->op = op;
-  s1->name = sr1->name;
-  s1->cat = 0;//sr1->cat;
-  s1->typ = sr1->typ;
-  s1->ref = sr1->ref;
-  tmp_code->sr1 = s1;
-  s2->name = sr2->name;
-  s2->cat = sr2->cat;
-  s2->typ = sr2->typ;
-  s2->ref = sr2->ref;
-  tmp_code->sr2 = s2;
+  tmp_code->sr1 = sr1;
+  tmp_code->sr2 = sr2;
   tmp_code->typ = 2;
   //cout<<"************"<<tmp_code->op.c_str()<<endl;
   cout<<mytab.ctl_idx<<endl;
@@ -113,31 +117,13 @@ cout<<"%%%%%%%%%%^^^^^^^ 2 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
 void midCodeFunc::gen_mid_code(string op,symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
 cout<<"%%%%%%%%%%^^^^^^^ 3 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
   midCode* tmp_code = new midCode;
-  symbolTab* s1 = new symbolTab;
-  symbolTab* s2 = new symbolTab;
-  symbolTab* d = new symbolTab;
   mytab.ctab[mytab.ctl_idx] = tmp_code;
 
 
-  s1->name = sr1->name;
-  s1->cat = sr1->cat;
-  s1->typ = sr1->typ;
-  s1->ref = sr1->ref;
-
-  s2->name = sr2->name;
-  s2->cat = sr2->cat;
-  s2->typ = sr2->typ;
-  s2->ref = sr2->ref;
-
-  d->name = dst->name;
-  d->cat = dst->cat;
-  d->typ = dst->typ;
-  d->ref = dst->ref;
-
   tmp_code->op = op;
-  tmp_code->sr1 = s1;
-  tmp_code->sr2 = s2;
-  tmp_code->dst = d;
+  tmp_code->sr1 = sr1;
+  tmp_code->sr2 = sr2;
+  tmp_code->dst = dst;
   tmp_code->typ = 3;
   mytab.ctl_idx++;
   /*

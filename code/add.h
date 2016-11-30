@@ -7,8 +7,10 @@ using namespace std;
 typedef struct t1{
   string name;//����
   int cat;//���� 0:lab 1:const 2:var 3:array 4:string 5:retfunc 6:voidfunc
-  int typ;//���� 0:void 1:int 2 char
-  int ref = 0;//�����������顢�ַ�������Ӧ��������;ֵ�ͷ���Ϊ��������ַ
+  int typ;//���� 0:void 1:int 2 char,3 tmp,4 gb 5 lab
+  int addr;
+  int ref = 0;//�����������顢�ַ�������Ӧ��������;ֵ�ͷ���Ϊ��������
+
 }symbolTab;
 
 typedef struct midcd{

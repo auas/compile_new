@@ -77,9 +77,13 @@ class block{
       void showGlob();
       void showMainLocal();
 
-      void check_sbl(string funcName, string name,symbolTab* ret);//根据函数名称查name的符号
+      symbolTab* check_sbl(string funcName, string name);//根据函数名称查name的符号
+      symbolTab* check_sbl(string name);// for func!
+
 
       int check_array(symbolTab* sr1);// insure is an array
+
+      void set_str(symbolTab* str);
 
 };
 # endif

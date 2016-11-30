@@ -38,12 +38,9 @@ int main()
     bk.const_auas();
     bk.var();
     bk.funcs();
-    int num_gb = genTmp.resetTmp();
-    mytab.get_addr_gb();
-
     bk.mainFunc();
-    //cout<<"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"<<endl;
-   // mytab.showStab(0,mytab.getSbl_idx());
+    cout<<"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"<<endl;
+    mytab.showStab(0,mytab.getSbl_idx());
     cout<<"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
     mytab.showBtab("func1");
     mytab.showBtab("func2");
@@ -56,9 +53,8 @@ int main()
     //string a;
     //a.c_str();
     //genMips.genString();
-    genMips.gen_mips();
-    bk.showMainLocal();
-    //genMips.init_data();
+    //genMips.gen_mips();
+    genMips.init_data();
 
     return 0;
 }

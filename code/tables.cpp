@@ -145,6 +145,7 @@ void tables::showStab(int a,int b){
     cout<<"name: "<<stab[i].name<<endl;
     cout<<"cat: "<<stab[i].cat<<"  typ: "<<stab[i].typ<<endl;
     cout<<"ref: "<<stab[i].ref<<endl;
+    cout<<"addr: "<<stab[i].addr<<endl;
   }
 }
 void tables::showStab(int a,int b,int c,int d){
@@ -216,6 +217,20 @@ bool tables::isThere(string name,int a,int b,int*cat,int*typ,int*ref){
   return false;
 }
 
+int tables::isThere(string name,int a,int b,int*cat,int*typ,int*ref,int def){
+  //ret = -1;
+  for(int i=a;i<b;i++){
+    if((stab[i].name==name)&&((stab[i].cat==5)||(stab[i].cat==6))){
+      *cat = stab[i].cat;
+      *typ = stab[i].typ;
+      *ref = stab[i].ref;
+      return i;
+    }
+
+  }
+  return -1;
+}
+
 
 void tables::showBtab(string funcName){
   int cat,typ,ref;
@@ -229,6 +244,7 @@ void tables::showBtab(string funcName){
     //cout<<tmp.c_addr<<endl;
     cout<<tmp.p1_addr<<endl;
     cout<<tmp.p2_addr<<endl;
+    cout<<"&&  "<<tmp.c_addr;
     cout<<"****"<<endl;
     showStab(tmp.p1_addr,tmp.p2_addr+1);
     cout<<"****"<<endl;
@@ -240,29 +256,50 @@ void tables::showBtab(string funcName){
 }
 
 
-void tables::cheq_stab(string name,int a,int b,symbolTab* ret){ //在中找a<x<=b name
+
+
+
+symbolTab* tables::cheq_stab(string name,int a,int b){ //在中找a<x<=b name
+  symbolTab* ret;
   for(int i = b;i>a;i--){
     if(stab[i].name == name){
+      ret = &stab[i];
+      return ret;
+      /*
       ret->name = stab[i].name;
       ret->cat = stab[i].cat;
       ret->typ = stab[i].typ;
       ret->ref = stab[i].ref;
-      return;
+      ret->addr = stab[i].addr;
+      */
+      //return ret;
     }
   }
-    ret->name ="#null";
+  symbolTab* null = new symbolTab;
+  ret = null;
+  ret->name ="#null";
+  return ret;
 }
 
-void tables::cheq_stab(string name,symbolTab* ret){
+symbolTab* tables::cheq_stab(string name){
+  symbolTab* ret;
     for(int i=sbl_idx-1;i>-1;i--){
       if(stab[i].name==name){
+        ret  = &stab[i];
+        return ret;
+        /*
         ret->name = stab[i].name;
         ret->cat = stab[i].cat;
         ret->typ = stab[i].typ;
         ret->ref = stab[i].ref;
+        ret->addr = stab[i].addr;
+        */
       }
       else{
+        symbolTab* null = new symbolTab;
+        ret = null;
         ret->name ="#null";
+        return ret;
       }
   }
 }
@@ -275,11 +312,83 @@ void tables::print_midCode(midCode cd){
       cout<<cd.op<<" "<<cd.sr1->name.c_str()<<" "<<cd.sr2->name.c_str()<<endl;
     else if (typ==1)
       cout<<cd.op<<" "<<cd.sr1->name.c_str()<<endl;
+    else if (typ==0)
+      cout<<cd.op<<endl;
     //errormsg("not def midcode typ","?");
 }
 
 void tables::print_midCode(){
   for(int i=0;i<ctl_idx;i++){
     print_midCode(*ctab[i]);
+  }
+}
+void tables::addstr(string str){
+  strtab[strtl_idx].s = str;
+  strtl_idx++;
+  //ToAdd
+}
+int tables::change_addr(int p1,int p2,int tmp_k){
+  int k = 0;
+  int addr = 0;
+  k = cal_k(p1,p2,tmp_k);
+  for(int i = p1;i<p2;i++){
+    if(stab[i].cat!=3){
+      addr = addr+1;
+      stab[i].addr = 4*(k-2-addr);
+    }
+    else{
+      addr+=get_array_len(stab[i].ref); //return array len
+      stab[i].addr = 4*(k-2-addr);
+    }
+
+  }
+  //showStab(p1,p2);
+  cout<<"@@"<<endl;
+  //while(1);
+  return k;
+} // tmp_k = 2+tmp_num
+
+int tables::get_array_len(int ref){
+  return atab[ref].len;
+}
+
+int tables::cal_k(int p1,int p2,int tmp_k){  //p2偏移1
+  int k = tmp_k;
+  for(int i=p1;i<p2;i++){
+    if(stab[i].cat!=3){
+      k++;
+    }
+    else{
+      k+=get_array_len(stab[i].ref);
+    }
+  }
+  return k;
+}
+
+void tables::cal_addr(string funcName){
+  int cat,typ,ref;
+  bool cq = isThere(funcName,0,sbl_idx,&cat,&typ,&ref);
+  if (cq == 0){
+    cout<<"there is no func named: "<<funcName<<endl;
+  }
+  else{
+    blockTab tmp = btab[ref];
+    int k = 0;
+    k= change_addr(tmp.p1_addr,tmp.p2_addr+1,tmp.c_addr);
+    btab[ref].c_addr = k*4;
+  }
+}
+void tables::get_addr_gb(){
+  int addr = 0;
+  for(int i=0;i<sbl_idx;i++){
+    if(stab[i].cat!=3){
+      addr = addr+1;
+      stab[i].addr = 4*addr;
+    }
+    else{
+      addr+=get_array_len(stab[i].ref); //return array len
+      stab[i].addr = 4*addr;
+    }
+    stab[i].typ = 4;
   }
 }

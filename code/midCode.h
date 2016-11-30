@@ -26,6 +26,7 @@ class genTmpVar{ // ����string���͵��м��������
     genTmpVar();
     string getName();
     void getTmpVar(symbolTab* tmp);
+    int resetTmp();
 };
 
 class genLabel { // ����string���͵��м���������
@@ -44,6 +45,7 @@ public:
   void gen_mid_code(string op,symbolTab* sr1,symbolTab* sr2,symbolTab* dst);
   void gen_mid_code(string op,symbolTab* sr1,symbolTab* dst);
   void gen_mid_code(string op,symbolTab* sr1);
+  void gen_mid_code(string op);
 };
 
 #endif // MIDCODE_H

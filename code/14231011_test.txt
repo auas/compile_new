@@ -10,17 +10,18 @@ a = 1+2*(a+f11)*f22;
 for(a=1;a<100;a=a+1){
 printf("sdfsd",a);
 }
-  return f11;
+  return (f11);
 }
 
 void func2(char ffa,char ffb){
   int f21;
   char f22;
+return;
 }
 
 void main(){
   int aaa;
-  char b;
+  char b1;
   int c[10];
   for(aaa=1;a<100;a=a+1){
     printf("sdfsd",a);
@@ -36,4 +37,5 @@ void main(){
     }
   }while((aaa*3+1)>b)
 aaa = 3+func1(1,2+2*(3+7))*aaa;
+return
 }

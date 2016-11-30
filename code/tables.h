@@ -59,14 +59,26 @@ class tables{ // to do !!! limit name len !!! string 的问题！！
     int isReFunc(string name);
     int isVdFunc(string name);
     bool isThere(string name,int a,int b,int*cat,int*typ,int*ref);
+    int isThere(string name,int a,int b,int*cat,int*typ,int*ref,int dif);
 
     void showBtab(string funcName);
 
-    void cheq_stab(string name,int a,int b,symbolTab* ret); //在中找a<x<=b name
-    void cheq_stab(string name,symbolTab* ret);
+    symbolTab* cheq_stab(string name,int a,int b); //在中找a<x<=b name
+    symbolTab* cheq_stab(string name);
 
     void print_midCode();
     void print_midCode(midCode cd);
+
+    void addstr(string str);
+
+    void set_c_addr(string funcName,int numTmp);
+
+    int change_addr(int p1,int p2,int tmp_k);//return k
+    int get_array_len(int ref);
+    int cal_k(int p1,int p2,int tmp_num);
+    void cal_addr(string funcName);
+
+    void get_addr_gb();
 
 
 };

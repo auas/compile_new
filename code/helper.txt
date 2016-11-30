@@ -1,0 +1,135 @@
+check_sbl(funcName,name,sr1);
+        
+check_array(sr1); // insure is an array
+       
+ symbolTab* sr2 = new symbolTab;
+
+symbolTab* tmp = new symbolTab;
+
+      symbolTab* sr1 = new symbolTab;
+ 
+     becomeSent(tmp);
+      
+check_sbl(funcName,name,sr1);
+      
+mdF.gen_mid_code("set",sr1,tmp);
+
+
+
+if(s=="lss"){
+    return 1;
+  }
+  
+else if(s=="ngtr"){
+    return 1;
+  }
+  
+else if(s=="nlss"){
+    return 1;
+  }
+  
+else if(s=="gtr"){
+    return 1;
+  }
+  
+else if(s=="eql"){
+    return 1;
+  }
+  
+else if(s=="neql"){
+    return 1;
+  }
+  
+else{
+    return 0;
+  }
+
+
+
+
+symbolTab* lab = new symbolTab;
+  
+genLb.getLabel(lab);
+  
+mdF.gen_mid_code("set_lab",lab);
+
+symbolTab* str = new symbolTab;
+      
+set_str(str);
+
+
+
+
+
+
+
+symbolTab* tmp1 = new symbolTab;
+        //mytab.cheq_stab(name,&tmp1);
+        
+check_sbl(funcName,name,tmp1);
+
+        
+if((tmp1->name=="#null")||(tmp1->cat!=5)){
+            cout<<tmp1->cat<<endl;
+            errormsg("no def func calling ! to fix",tmp1->name);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+tmp_btl_idx = mytab.enterVdFun(1,name);
+    
+funcName = name; // 全局记录当前分析到的函数
+    
+func_start_stab_indx =  mytab.getSbl_idx();// 没有偏移！
+
+
+else{
+      func_pare_stab_indx = mytab.getSbl_idx(); //偏移+1
+      
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+      
+syn.get_token();
+      
+if(syn.typ=="rbrace"){
+
+
+
+  int p1_num = func_pare_stab_indx - func_start_stab_indx; //形参个数
+      
+mytab.enterFun(2,funcName,func_start_stab_indx,p1_num);
+      
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+      
+statement();
+
+
+else{
+
+        func_local_stab_indx = mytab.getSbl_idx(); // 偏移+1
+       
+ p2_num = func_local_stab_indx - func_pare_stab_indx;
+        
+mytab.enterFun(3,funcName,func_local_stab_indx-1,p2_num,0); //fix c_addr!
+       
+ //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        
+syn.get_token();
+      }
+
+
+
+int num_tmp = genTmp.resetTmp();
+        
+int tmp_k = num_tmp+3; // 3=ra+sp+pad
