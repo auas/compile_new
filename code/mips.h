@@ -67,11 +67,13 @@ public:
     void mips_times(symbolTab* sr1,symbolTab* sr2,symbolTab* sr3);
     void mips_slash(symbolTab* sr1,symbolTab* sr2,symbolTab* sr3);
     void mips_get_array(symbolTab* sr1,symbolTab* sr2,symbolTab* dst);
+    void mips_set_array(symbolTab* sr1,symbolTab* sr2,symbolTab* dst);
     void mips_add_para(symbolTab* st1,symbolTab* sr2);
 
 
     void init_func(symbolTab* sr1);
     void mips_begin_func(symbolTab* sr1);
+
 
 };
 

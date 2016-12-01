@@ -54,9 +54,10 @@ void block::expression(symbolTab* &tmp){
     //genTmp.getTmpVar(tmp_1)
     term(sr1);
     //string op;
-    mdF.gen_mid_code(op,sr1,tmp,tmp);
+    mdF.gen_mid_code(op,tmp,sr1,tmp);
   }
 
+cout<<"$$$$"<<tmp->name<<endl;
 }//表达式
 
 void block::term(symbolTab* &tmp){
@@ -74,6 +75,7 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
   cout<<"there is a factor"<<endl;
   if(syn.typ=="numsym"){//more to check symble table!
     //cout<<"#######   "<<syn.tmp_token<<endl;
+    tmp = new symbolTab;
     genTmp.getTmpVar(tmp); //!!!!!!!!!!!!!!!!!!!!! TO CHECK!!
     symbolTab* sr1 = new symbolTab;
     sr1->name = syn.tmp_token;
@@ -92,6 +94,7 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
   else if(syn.typ=="charsym"){ // to transform!!
 
     //cout<<"#######    "<<syn.tmp_token<<endl;
+    tmp = new symbolTab;
     genTmp.getTmpVar(tmp);
     symbolTab* sr1 = new symbolTab;
     sr1->name = syn.tmp_token;
@@ -775,17 +778,30 @@ void block::forSent(){
                     //### lookup tables!!
                   }
                   else{
+                      symbolTab* sr1;
+                      sr1 = check_sbl(funcName,syn.tmp_token);//???##$$%%
                       //### lookup tables!!
                       syn.get_token();
                       if(syn.typ!="plus"&&syn.typ!="minus"){
                         errormsg("for p2 ill +,- ",syn.tmp_token);
                       }
                       else{
+                        string opp = syn.typ;
                         syn.get_token();
                         if(syn.typ!="numsym"){
                           errormsg("for p3 ill num",syn.tmp_token);
                         }
                         else{
+                          symbolTab* ttmp = new symbolTab;
+                          ttmp->name = syn.tmp_token;
+                          //???##$$
+                          ttmp->typ = 5;
+
+                          symbolTab* sr2 = new symbolTab;
+                          genTmp.getTmpVar(sr2);
+                          mdF.gen_mid_code("set_I",ttmp,sr2);
+                          mdF.gen_mid_code(opp,sr1,sr2,sr1);
+
                           int bc = syn.str2num(syn.tmp_token,1);
                           syn.get_token();
                           if(syn.typ!="rparen"){
@@ -939,7 +955,7 @@ int block::islogic(string s){
 
 }
 
-void block::condition(symbolTab*label){
+void block::condition(symbolTab* &label){
   //＜条件＞    ::=  ＜表达式＞＜关系运算符＞＜表达式＞｜＜表达式＞
   cout<<"there is a condition"<<endl;
   symbolTab* tmp1 = new symbolTab;
@@ -990,8 +1006,12 @@ void block::conditionSent(){
   else{
     symbolTab* lab1 = new symbolTab;
     genLb.getLabel(lab1);
+
     symbolTab* lab2 = new symbolTab;
     genLb.getLabel(lab2);
+
+    symbolTab* lab3 = new symbolTab;
+    genLb.getLabel(lab3);
 
     syn.get_token();
     condition(lab1);
@@ -1003,14 +1023,17 @@ void block::conditionSent(){
     else{
       syn.get_token();
       sent();
+      mdF.gen_mid_code("goto",lab3);
       mdF.gen_mid_code("set_lab",lab2);
       if(syn.typ!="elsesym"){
+        mdF.gen_mid_code("set_lab",lab3);
         return;
       }
       else{
         syn.get_token();
         sent();
         //Scout<<"auas!!!!  "<<syn.tmp_token<<endl;
+        mdF.gen_mid_code("set_lab",lab3);
         return;
       }
     }
@@ -1035,7 +1058,7 @@ int block::sent(){
   else if(syn.typ=="dosym"){
     syn.get_token();
     whileSent();
-      syn.get_token();
+    //  syn.get_token();
       return 1;
   }
   else if(syn.typ=="forsym"){
@@ -1070,6 +1093,8 @@ int block::sent(){
     }
   }
   else if(syn.typ=="returnsym"){
+    symbolTab* tmp_func;
+    tmp_func = check_sbl(funcName);
     cout<<"there is a return stat"<<endl;
     syn.get_token();
     if(syn.typ=="lparen"){
@@ -1080,7 +1105,7 @@ int block::sent(){
         errormsg("lose rparen in return",syn.tmp_token);
       }
       else{
-        mdF.gen_mid_code("return",ret);
+        mdF.gen_mid_code("return",ret,tmp_func);
         syn.get_token();
         if(syn.typ!="endcmd"){
           errormsg("losing endcmd",syn.tmp_token);
@@ -1095,7 +1120,8 @@ int block::sent(){
       while(syn.typ!="endcmd") // to fix
         syn.get_token();
       syn.get_token();
-      mdF.gen_mid_code("returnNull");
+
+      mdF.gen_mid_code("returnNull",tmp_func);
       return 1;
     }
 
@@ -1265,7 +1291,7 @@ void block::errormsg(string s,string token){
   while(1);
 }
 
-void block::becomeSent(symbolTab* tmp){
+void block::becomeSent(symbolTab* &tmp){
     //从=下一个字符开始
     //＜标识符＞＝＜表达式＞|＜标识符＞‘[’＜表达式＞‘]’=＜表达式＞
     expression(tmp);

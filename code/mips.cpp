@@ -64,6 +64,9 @@ void mips::gen_mips(){
         else if(tmp_code->op == "get_array"){
           mips_get_array(sr1,sr2,dst);
         }
+        else if(tmp_code->op == "set_array_val"){
+          mips_set_array(sr1,sr2,dst);
+        }
         else if(tmp_code->op == "add_para"){
           mips_add_para(sr1,sr2);
         }
@@ -71,15 +74,31 @@ void mips::gen_mips(){
           mips_begin_func(sr1);
         }
         else if(tmp_code->op == "finish_func"){
+
           int c_addr = mytab.btab[sr1->ref].c_addr;
+          lw(ra(),shift(c_addr,sp()));
           lw(sp(),shift(c_addr-4,sp()));
           jr(ra());
         }
         else if(tmp_code->op == "end_func"){
-          SW(v(1),sr2);
+          if(sr1->cat==5)
+            SW(v(1),sr2);
         }
         else if(tmp_code->op == "return"){
-          LW(v(1),sr1);
+
+          int c_addr = mytab.btab[sr2->ref].c_addr;
+          //if(sr1->cat==5)
+            LW(v(1),sr1);
+          lw(ra(),shift(c_addr,sp()));
+          lw(sp(),shift(c_addr-4,sp()));
+
+          jr(ra());
+        }
+        else if(tmp_code->op == "returnNull"){
+          int c_addr = mytab.btab[sr1->ref].c_addr;
+          lw(ra(),shift(c_addr,sp()));
+          lw(sp(),shift(c_addr-4,sp()));
+          jr(ra());
         }
         else if(tmp_code->op == "read"){
           li(v(0),int2str(5));
@@ -163,10 +182,11 @@ void mips::gen_mips(){
           sub(t(0),t(0),t(1));
           SW(t(0),dst);
         }
+
       /*
 
 
-        else if(tmp_code->op == "return"){
+        else if(tmp_code->op == "set_array_val"){
 
         }
         else if(tmp_code->op ==){
@@ -394,6 +414,24 @@ void mips::mips_get_array(symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
   add(t(0),t(0),t(1));
   lw(t(1),shift(0,t(0)));
   SW(t(1),dst);
+
+}
+
+void mips::mips_set_array(symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
+  LW(t(0),sr2);
+  li(t(1),"2");
+  sllv(t(0),t(0),t(1));
+
+  if(sr1->typ!=4){
+    //sub(t(0),"$zero",t(0));
+    ;
+  }
+
+  li(t(1),int2str(sr1->addr));
+  add(t(0),t(0),t(1));
+  LW(t(2),dst);
+  sw(t(2),shift(0,t(0)));
+
 
 }
 
