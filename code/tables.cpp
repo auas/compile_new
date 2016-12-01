@@ -28,13 +28,16 @@ tables::tables(){
     int dataAddr = 0;//待分配的数据区
 }
 
-void tables::enterCnst(int cnstTyp,string cnst_name){  //cnstTyp 1:int 2:char
+symbolTab* tables::enterCnst(int cnstTyp,string cnst_name){  //cnstTyp 1:int 2:char
+  symbolTab* ret;
   stab[sbl_idx].name = cnst_name;
   stab[sbl_idx].cat = 1;
   stab[sbl_idx].typ = cnstTyp;
   stab[sbl_idx].ref = dataAddr;
+  ret = &stab[sbl_idx];
   dataAddr+=(4/cnstTyp); //??区分字节大小：int 4字节 char 2字节
   sbl_idx++;
+  return ret;
 }//登陆常量
 int tables::enterVar(int varTyp,string name){  //varTyp 1:int 2:char
   int ret = sbl_idx;
@@ -322,9 +325,11 @@ void tables::print_midCode(){
     print_midCode(*ctab[i]);
   }
 }
-void tables::addstr(string str){
+int tables::addstr(string str){
+  int ret = strtl_idx;
   strtab[strtl_idx].s = str;
   strtl_idx++;
+  return ret;
   //ToAdd
 }
 int tables::change_addr(int p1,int p2,int tmp_k){

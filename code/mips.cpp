@@ -81,6 +81,76 @@ void mips::gen_mips(){
         else if(tmp_code->op == "return"){
           LW(v(1),sr1);
         }
+        else if(tmp_code->op == "read"){
+          li(v(0),int2str(5));
+          outfile<<"\tsyscall"<<endl;
+          SW(v(0),sr1);
+        }
+        else if(tmp_code->op == "write_str"){
+          int ref  = sr1->ref;
+          string tmp = strHead+int2str(ref);
+          li(v(0),int2str(4));
+          la(a(0),tmp);
+          outfile<<"\tsyscall"<<endl;
+        }
+        else if(tmp_code->op == "write_exp"){
+          LW(a(0),sr1);
+          li(v(0),int2str(1));
+          outfile<<"\tsyscall"<<endl;
+        }
+        else if(tmp_code->op == "bnez"){
+          LW(t(0),sr1);
+          bne(t(0),"zero",sr2->name);
+          nop();
+        }
+        else if(tmp_code->op == "bneq"){
+          LW(t(0),sr1);
+          LW(t(1),sr2);
+          bne(t(0),t(1),dst->name);
+          nop();
+        }
+        else if(tmp_code->op == "beq"){
+          LW(t(0),sr1);
+          LW(t(1),sr2);
+          beq(t(0),t(1),dst->name);
+          nop();
+        }
+        else if(tmp_code->op == "bgtr"){
+          LW(t(0),sr1);
+          LW(t(1),sr2);
+          sub(t(0),t(0),t(1));
+
+          bgtz(t(0),dst->name);
+          nop();
+        }
+        else if(tmp_code->op == "bnlss"){
+          LW(t(0),sr1);
+          LW(t(1),sr2);
+          sub(t(0),t(0),t(1));
+
+          bgez(t(0),dst->name);
+          nop();
+        }
+        else if(tmp_code->op == "blss"){
+          LW(t(0),sr1);
+          LW(t(1),sr2);
+          sub(t(0),t(1),t(0));
+
+          bgtz(t(0),dst->name);
+          nop();
+        }
+        else if(tmp_code->op == "bngtr"){
+          LW(t(0),sr1);
+          LW(t(1),sr2);
+          sub(t(0),t(1),t(0));
+
+          bgez(t(0),dst->name);
+          nop();
+        }
+        else if(tmp_code->op == "cnst"){
+          addi(t(0),"zero",sr2->ref);
+          SW(t(0),sr1);
+        }
       /*
 
 
@@ -124,6 +194,14 @@ string mips::s(int numb){
   sprintf(tmp,"%d",numb);
   string temp1(tmp);
   ret = "$s"+temp1;
+  return ret;
+}
+string mips::a(int numb){
+  string ret;
+  char tmp[100];
+  sprintf(tmp,"%d",numb);
+  string temp1(tmp);
+  ret = "$a"+temp1;
   return ret;
 }
 string mips::sp(){
@@ -212,7 +290,24 @@ void mips::addi(string s1,string s2,int a){
   string temp1(tmp);
   outfile<<"\t"<<"addi"<<" "<<s1.c_str()<<","<<s2.c_str()<<","<<temp1.c_str()<<endl;
 }
-
+void mips::la(string s1,string s2){
+  outfile<<"\t"<<"la"<<" "<<s1.c_str()<<","<<s2.c_str()<<endl;
+}
+void mips::nop(){
+  outfile<<"\tnop"<<endl;
+}
+void mips::bne(string s1,string s2,string s3){
+  outfile<<"\t"<<"bne"<<" "<<s1.c_str()<<","<<s2.c_str()<<","<<s3.c_str()<<endl;
+}
+void mips::beq(string s1,string s2,string s3){
+  outfile<<"\t"<<"beq"<<" "<<s1.c_str()<<","<<s2.c_str()<<","<<s3.c_str()<<endl;
+}
+void mips::bgez(string s1,string s2){
+  outfile<<"\t"<<"bgez"<<" "<<s1.c_str()<<","<<s2.c_str()<<endl;
+}
+void mips::bgtz(string s1,string s2){
+  outfile<<"\t"<<"bgtz"<<" "<<s1.c_str()<<","<<s2.c_str()<<endl;
+}
 
 string mips::str(string s){
   string ret = s;
@@ -262,13 +357,15 @@ void mips::mips_times(symbolTab* sr1,symbolTab* sr2,symbolTab* sr3){
   LW(t(0),sr1);
   LW(t(1),sr2);
   mult(t(0),t(1));
-  SW("LO",sr2);
+  outfile<<"\tmflo "<<t(0).c_str()<<endl;
+  SW(t(0),sr2);
 }
 void mips::mips_slash(symbolTab* sr1,symbolTab* sr2,symbolTab* sr3){
   LW(t(0),sr1);
   LW(t(1),sr2);
   div(t(0),t(1));
-  SW("LO",sr2);
+  outfile<<"\tmflo "<<t(0).c_str()<<endl;
+  SW(t(0),sr2);
 }
 void mips::mips_get_array(symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
   LW(t(0),sr2);

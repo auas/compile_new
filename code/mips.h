@@ -25,6 +25,7 @@ public:
     string v(int numb);
     string t(int numb);
     string s(int numb);
+    string a(int numb);
     string sp();
     string gb();
     string fp();
@@ -47,6 +48,12 @@ public:
     void sllv(string s1,string s2,string s3);
     void add(string s1,string s2,string s3);
     void addi(string sr1,string sr2,int a);
+    void la(string s1,string s2);
+    void bgtz(string s1,string s2);
+    void bgez(string s1,string s2);
+    void bne(string s1,string s2,string s3);
+    void beq(string s1,string s2,string s3);
+    void nop();
     //string move(string str1,string str2);
     //string move(string str1,string str2);
     //string move(string str1,string str2);

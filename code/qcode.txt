@@ -8,10 +8,15 @@
 @goto sr1  //无条件跳转	
 @"return",tmp //发返回，返回值在tmp中
 @"set_func_Lab",func //函数下标签
+@"read",sr1
+@write_exp,sr1
+@write_str,sr1
+
 ###############################################
 @set_I sr1 dst dst = sr1 //数值
 @set sr1,sr2====sr1 = sr2//变量赋值
 @neg sr1 dst   #dst = -sr1
+"cnst",sr1,sr2 // 常量定义 sr1 = sr2->ref
 no use!//load sr1 dst
 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
@@ -21,13 +26,13 @@ no use!//load sr1 dst
 set_array_val",sr1,sr2,dst//数组赋值 sr1[sr2] = dst ？？？？？？？？？？？？
 
 //跳转类：
-"blss",tmp1,tmp2,label // tmp1<tmp2跳转到label
-"bngtr",tmp1,tmp2,label tmp1<=tmp2
-"bnlss",tmp1,tmp2,label  tmp1>=tmp2
-"bgtr",tmp1,tmp2,label   tmp1>tmp2
-"beq",tmp1,tmp2,label   tmp1==tmp2
-bneq",tmp1,tmp2,label  tmp1!=tmp2
-"bnez",tmp1,label	tmp1!=0
+@"blss",tmp1,tmp2,label // tmp1<tmp2跳转到label
+@"bngtr",tmp1,tmp2,label tmp1<=tmp2
+@"bnlss",tmp1,tmp2,label  tmp1>=tmp2
+@"bgtr",tmp1,tmp2,label   tmp1>tmp2
+@"beq",tmp1,tmp2,label   tmp1==tmp2
+@bneq",tmp1,tmp2,label  tmp1!=tmp2
+@"bnez",tmp1,label	tmp1!=0
 
 
 

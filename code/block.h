@@ -30,6 +30,7 @@ class block{
       int state = 0; //全局变量定义时候 0，其他 1
       int globNum = 0;//全局变量个数
       int tmp_btl_idx;//当前分程序在分程序表中索引
+      symbolTab* lab_cnst;
 
       void const_auas();//常量说明
       void var();//变量说明
@@ -61,9 +62,9 @@ class block{
 
       void becomeSent(symbolTab* tmp);//赋值语句
 
-      void expression(symbolTab* ret);//表达式
-      void term(symbolTab* ret);//项
-      void factor(symbolTab* ret);//因子
+      void expression(symbolTab* &ret);//表达式
+      void term(symbolTab* &ret);//项
+      void factor(symbolTab* &ret);//因子
 
       void callRet(symbolTab* func,symbolTab* ret);//有返回值的函数调用
       void callVoid();//无返回值的函数调用

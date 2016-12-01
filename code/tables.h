@@ -30,7 +30,7 @@ class tables{ // to do !!! limit name len !!! string 的问题！！
     codeTab bt_ctab[2048];
     codeTab mips_ctab[2048];
     strTab strtab[1024]; //strtl_idx
-    void enterCnst(int cnstTyp,string cnst_name);//登陆常量
+    symbolTab* enterCnst(int cnstTyp,string cnst_name);//登陆常量
     int enterVar(int varTyp,string name);//登陆值变量
     void enterArry(int arrTyp,int len,int size_,string name);//登陆数组
     int enterStr(int size_,string s);//登陆字符串
@@ -69,7 +69,7 @@ class tables{ // to do !!! limit name len !!! string 的问题！！
     void print_midCode();
     void print_midCode(midCode cd);
 
-    void addstr(string str);
+    int addstr(string str);
 
     void set_c_addr(string funcName,int numTmp);
 

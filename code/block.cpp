@@ -24,9 +24,15 @@ block::block(){
     glob_stab_end_indx = 0;
     main_start_stab_indx = 0;//main函数第一个变量在符号表中的位置，直接指向，没有偏移
     end_all_stab_indx = 0; //符号表中最后一项+1
+    lab_cnst = new symbolTab; // const def lab
+    lab_cnst->name = "@@const_lab";
+    lab_cnst->typ = 5;
+    lab_cnst->ref = 0;
+    lab_cnst->cat = 0;
+
 }
 
-void block::expression(symbolTab* tmp){
+void block::expression(symbolTab* &tmp){
   cout<<"there is a expression"<<endl;
 
   string s = syn.typ; // save sign
@@ -49,7 +55,7 @@ void block::expression(symbolTab* tmp){
 
 }//表达式
 
-void block::term(symbolTab* tmp){
+void block::term(symbolTab* &tmp){
   factor(tmp);
   while(syn.typ=="times"||syn.typ=="slash"){
     string s = syn.typ;
@@ -60,7 +66,7 @@ void block::term(symbolTab* tmp){
   }
   cout<<"there is a term"<<endl;
 }//项
-void block::factor(symbolTab* tmp){ // !!unfinished!!
+void block::factor(symbolTab* &tmp){ // !!unfinished!!
   cout<<"there is a factor"<<endl;
   if(syn.typ=="numsym"){//more to check symble table!
     //cout<<"#######   "<<syn.tmp_token<<endl;
@@ -218,6 +224,11 @@ void block::const_auas(){
   //＜常量说明＞ ::=  const＜常量定义＞;{ const＜常量定义＞;}
   //cout<<syn.typ<<endl;
   //cout<<syn.typ<<endl;
+  int chq = 0;
+  if(funcName=="start"&&syn.typ=="constsym"){
+    chq = 1;//mark it
+    mdF.gen_mid_code("set_lab",lab_cnst);
+  }
   while(syn.typ=="constsym"){
     syn.get_token();
     constDef();
@@ -227,6 +238,12 @@ void block::const_auas(){
     }
     syn.get_token();
     cout<<"there is a const declear"<<endl;
+  }
+  if(chq){
+    symbolTab* sr1 = new symbolTab;
+    sr1->name = "main_start";
+    sr1->typ = 5;
+    mdF.gen_mid_code("goto",sr1);
   }
 
 }//常量说明
@@ -246,7 +263,13 @@ void block::constDef(){
       syn.get_token();
       int interger_val = integer();
       //todo :登陆符号表！！ 具体数值暂时没有登陆！！！
-      mytab.enterCnst(1,cnst_name);//syn.get_token(); 在integer()中完成
+      symbolTab* sr1;
+      sr1 = mytab.enterCnst(1,cnst_name);//syn.get_token(); 在integer()中完成
+      symbolTab* sr2 = new symbolTab;
+      sr2->typ = 3;
+      sr2->name = "store_cnst";
+      sr2->ref = interger_val;
+      mdF.gen_mid_code("cnst",sr1,sr2);
       cout<<"name = "<<cnst_name<<" ## "<<"varvalue="<< interger_val<<endl;
       //syn.get_token();
     }while(syn.typ=="comma");
@@ -269,7 +292,13 @@ void block::constDef(){
         while(1);
       }
       //todo :登陆符号表！！ 具体数值暂时没有登陆！！！
-      mytab.enterCnst(2,cnst_name);//syn.get_token(); 在integer()中完成
+      symbolTab* sr1;
+      sr1 = mytab.enterCnst(2,cnst_name);//syn.get_token(); 在integer()中完成
+      symbolTab* sr2 = new symbolTab;
+      sr2->typ = 3;
+      sr2->name = "store_cnst";
+      sr2->ref = int(syn.tmp_token[0]);
+      mdF.gen_mid_code("cnst",sr1,sr2);
       cout<<"name = "<<cnst_name<<" ## "<<"varvalue="<< syn.tmp_token<<endl;
       syn.get_token();
     }while(syn.typ=="comma");
@@ -1192,6 +1221,11 @@ void block::mainFunc(){
     symbolTab* func;
     func = check_sbl(funcName);
     mdF.gen_mid_code("set_func_Lab",func);
+    mdF.gen_mid_code("goto",lab_cnst);
+    symbolTab* m = new symbolTab;
+    m->name = "main_start";
+    m->typ = 5;
+    mdF.gen_mid_code("set_lab",m);
 
   int p1_num = 0;
   mytab.enterFun(2,funcName,func_start_stab_indx,p1_num);
@@ -1376,5 +1410,5 @@ int block::check_array(symbolTab* sr1)// insure is an array
 void block::set_str(symbolTab* str){
   str->name = syn.tmp_token;
   str->cat = 4;
-  mytab.addstr(syn.tmp_token);
+  str->ref = mytab.addstr(syn.tmp_token);
 }
