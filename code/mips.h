@@ -14,7 +14,7 @@ class mips{
 public:
     ofstream outfile;
     string fileName = "finalMIPS.txt";
-    string strHead = "!str";
+    string strHead = "$str";
     int num;
     int k;// running stack size/4
     mips();

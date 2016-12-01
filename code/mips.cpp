@@ -100,7 +100,7 @@ void mips::gen_mips(){
         }
         else if(tmp_code->op == "bnez"){
           LW(t(0),sr1);
-          bne(t(0),"zero",sr2->name);
+          bne(t(0),"$zero",sr2->name);
           nop();
         }
         else if(tmp_code->op == "bneq"){
@@ -148,8 +148,20 @@ void mips::gen_mips(){
           nop();
         }
         else if(tmp_code->op == "cnst"){
-          addi(t(0),"zero",sr2->ref);
+          addi(t(0),"$zero",sr2->ref);
           SW(t(0),sr1);
+        }
+        else if(tmp_code->op == "plus"){
+          LW(t(0),sr1);
+          LW(t(1),sr2);
+          add(t(0),t(0),t(1));
+          SW(t(0),dst);
+        }
+        else if(tmp_code->op == "minus"){
+          LW(t(0),sr1);
+          LW(t(1),sr2);
+          sub(t(0),t(0),t(1));
+          SW(t(0),dst);
         }
       /*
 
@@ -164,7 +176,9 @@ void mips::gen_mips(){
 
         }
 */
+
     }
+    outfile<<"end:";
 }
 void mips::mips_gen_lab(string lab){
   outfile<<lab<<":"<<endl;
@@ -211,7 +225,7 @@ string mips::sp(){
 }
 string mips::gb(){
   string ret;
-  ret = "$gb";
+  ret = "$gp";
   return ret;
 }
 
@@ -349,7 +363,7 @@ void mips::mips_set(symbolTab* sr1,symbolTab* sr2){
 
 void mips::mips_neg(symbolTab* sr1,symbolTab* sr2){
   LW(t(0),sr1);
-  sub(t(0),"zero",t(0));
+  sub(t(0),"$zero",t(0));
   SW(t(0),sr2);
 }
 
@@ -373,7 +387,7 @@ void mips::mips_get_array(symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
   sllv(t(0),t(0),t(1));
 
   if(sr1->typ!=4){
-    sub(t(0),"zero",t(0));
+    sub(t(0),"$zero",t(0));
   }
 
   li(t(1),int2str(sr1->addr));
@@ -395,7 +409,7 @@ void mips::mips_begin_func(symbolTab* sr1){
 }
 
 void mips::init_func(symbolTab* sr1){
-  sw(sp(),shift(4,sp()));
+  sw(sp(),shift(-4,sp()));
   sw(ra(),shift(0,sp()));
   int shf = -(mytab.btab[sr1->ref].c_addr);
   addi(sp(),sp(),shf);

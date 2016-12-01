@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1480550412 source:c:\compile_auas-master\code\block.cpp
+1480566436 source:c:\compile_auas-master\code\block.cpp
 	<stdio.h>
 	<map>
 	<fstream>
@@ -26,7 +26,7 @@
 	<string>
 	"add.h"
 
-1480498766 source:c:\compile_auas-master\code\main.cpp
+1480562349 source:c:\compile_auas-master\code\main.cpp
 	<iostream>
 	<stdio.h>
 	<map>
@@ -74,12 +74,12 @@
 	<string.h>
 	<stdlib.h>
 
-1480548660 c:\compile_auas-master\code\mips.h
+1480556697 c:\compile_auas-master\code\mips.h
 	<iostream>
 	<fstream>
 	"tables.h"
 	"midCode.h"
 
-1480548885 source:c:\compile_auas-master\code\mips.cpp
+1480561763 source:c:\compile_auas-master\code\mips.cpp
 	"mips.h"
 

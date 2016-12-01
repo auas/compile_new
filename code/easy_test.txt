@@ -12,6 +12,12 @@ void main(){
   int b;
   int c;
   b = 1+2*3;
-  test_exp();
+  c = test_exp();
+  printf(c);
+  if(c==136)
+    printf("right with test_exp\n");
+  else
+    printf("wrong with test_exp\n");
+  printf("finish test_exp\n");
   return;
 }

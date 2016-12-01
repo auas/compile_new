@@ -25,7 +25,7 @@ block::block(){
     main_start_stab_indx = 0;//main函数第一个变量在符号表中的位置，直接指向，没有偏移
     end_all_stab_indx = 0; //符号表中最后一项+1
     lab_cnst = new symbolTab; // const def lab
-    lab_cnst->name = "@@const_lab";
+    lab_cnst->name = "const_lab";
     lab_cnst->typ = 5;
     lab_cnst->ref = 0;
     lab_cnst->cat = 0;
@@ -35,6 +35,8 @@ block::block(){
 void block::expression(symbolTab* &tmp){
   cout<<"there is a expression"<<endl;
 
+  tmp = new symbolTab;
+  genTmp.getTmpVar(tmp);
   string s = syn.typ; // save sign
   if(syn.typ=="plus"||syn.typ=="minus"){
     syn.get_token();
@@ -48,6 +50,8 @@ void block::expression(symbolTab* &tmp){
     string op = syn.typ;
     syn.get_token();
     symbolTab* sr1 = new symbolTab;
+    //symbolTab* tmp_1=new symbolTab;
+    //genTmp.getTmpVar(tmp_1)
     term(sr1);
     //string op;
     mdF.gen_mid_code(op,sr1,tmp,tmp);
@@ -154,15 +158,24 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
         }
 
         else{
-          syn.get_token();
+          //syn.get_token();
+          if(syn.typ!="lparen"){
+            errormsg("lose lparen ",syn.tmp_token);
+          }
+          else{
+            syn.get_token();
+          }
           callRet(tmp1,tmp);
+      /*
           if (syn.typ!="rparen"){
 
             errormsg("losing rparen in func calling",syn.tmp_token);
           }
+      */
+          if(0);
           else{
             cout<<"auas is there!"<<endl;
-            syn.get_token();
+            //syn.get_token();
             return;
           }
         }
@@ -170,13 +183,13 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
       else{
           //syn.get_token();
           //symbolTab* check_sbl(string funcName, string name);//根据函数名称查name的符号
-
-          //genTmp.getTmpVar(tmp);
+          tmp = new symbolTab;
+          genTmp.getTmpVar(tmp);
           symbolTab* sr1;
           sr1 = check_sbl(funcName, name);
           //string op = "load";
-          //mdF.gen_mid_code(op,sr1,tmp);
-          tmp = sr1;
+          mdF.gen_mid_code("set",tmp,sr1);
+          //tmp = sr1;
           return;
       }
     }
@@ -225,7 +238,7 @@ void block::const_auas(){
   //cout<<syn.typ<<endl;
   //cout<<syn.typ<<endl;
   int chq = 0;
-  if(funcName=="start"&&syn.typ=="constsym"){
+  if(funcName=="start"){
     chq = 1;//mark it
     mdF.gen_mid_code("set_lab",lab_cnst);
   }
@@ -1367,8 +1380,9 @@ symbolTab* block::check_sbl(string name){
 
 
 void block::callRet(symbolTab* func,symbolTab* tmp){
-  syn.get_token();
+  //syn.get_token();
   if(syn.typ=="rparen"){
+    syn.get_token();
     mdF.gen_mid_code("begin_func",func);
   }
   else{
@@ -1395,11 +1409,16 @@ void block::callRet(symbolTab* func,symbolTab* tmp){
       expression(tmp1);
       mdF.gen_mid_code("add_para",tmp1,tmp2);
     }
-
+    if(syn.typ!="rparen"){
+      errormsg("lose rparen",syn.tmp_token);
+    }
+    else
+      syn.get_token();
     mdF.gen_mid_code("begin_func",func);
-    genTmp.getTmpVar(tmp);
-    mdF.gen_mid_code("end_func",func,tmp);
+
   }
+  genTmp.getTmpVar(tmp);
+  mdF.gen_mid_code("end_func",func,tmp);
 
 }
 

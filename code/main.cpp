@@ -37,9 +37,10 @@ int main()
     syn.get_token();
     bk.const_auas();
     bk.var();
+    mytab.get_addr_gb();
     bk.funcs();
     int num_gb = genTmp.resetTmp();
-    mytab.get_addr_gb();
+
 
     bk.mainFunc();
     //cout<<"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"<<endl;
