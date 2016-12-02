@@ -3,16 +3,17 @@ $str0: .asciiz "hello!\n"
 $str1: .asciiz "enter an int\n"
 $str2: .asciiz "\n you enter: "
 $str3: .asciiz "show array result"
-$str4: .asciiz "right with test_exp\n"
-$str5: .asciiz "wrong with test_exp\n"
-$str6: .asciiz "finish test_exp\n"
-$str7: .asciiz "start testing scanf\n"
-$str8: .asciiz "\n start testing func\n"
-$str9: .asciiz "end testing func\n"
-$str10: .asciiz "start testing cycle\n"
-$str11: .asciiz "\nend testing cycle\n"
-$str12: .asciiz "start testing array\n"
-$str13: .asciiz "\nend testing array\n"
+$str4: .asciiz "\n*\n"
+$str5: .asciiz "right with test_exp\n"
+$str6: .asciiz "wrong with test_exp\n"
+$str7: .asciiz "finish test_exp\n"
+$str8: .asciiz "start testing scanf\n"
+$str9: .asciiz "\n start testing func\n"
+$str10: .asciiz "end testing func\n"
+$str11: .asciiz "start testing cycle\n"
+$str12: .asciiz "\nend testing cycle\n"
+$str13: .asciiz "start testing array\n"
+$str14: .asciiz "\nend testing array\n"
 .text
 	li $s7,0x10040000
 	move $fp,$sp
@@ -78,33 +79,6 @@ test_exp:
 	jr $ra
 	lw $ra,72($sp)
 	lw $sp,68($sp)
-	jr $ra
-test_scanf:
-	sw $sp,-4($sp)
-	sw $ra,0($sp)
-	addi $sp,$sp,-20
-	li $v0,4
-	la $a0,$str0
-	syscall
-	li $v0,4
-	la $a0,$str1
-	syscall
-	li $v0,5
-	syscall
-	sw $v0,4($gp)
-	li $v0,4
-	la $a0,$str2
-	syscall
-	lw $t0,4($gp)
-	sw $t0,8($sp)
-	lw $a0,8($sp)
-	li $v0,1
-	syscall
-	lw $ra,20($sp)
-	lw $sp,16($sp)
-	jr $ra
-	lw $ra,20($sp)
-	lw $sp,16($sp)
 	jr $ra
 test_func:
 	sw $sp,-4($sp)
@@ -222,16 +196,43 @@ $label7:
 	lw $ra,88($sp)
 	lw $sp,84($sp)
 	jr $ra
+test_scanf:
+	sw $sp,-4($sp)
+	sw $ra,0($sp)
+	addi $sp,$sp,-20
+	li $v0,4
+	la $a0,$str0
+	syscall
+	li $v0,4
+	la $a0,$str1
+	syscall
+	li $v0,5
+	syscall
+	sw $v0,4($gp)
+	li $v0,4
+	la $a0,$str2
+	syscall
+	lw $t0,4($gp)
+	sw $t0,8($sp)
+	lw $a0,8($sp)
+	li $v0,1
+	syscall
+	lw $ra,20($sp)
+	lw $sp,16($sp)
+	jr $ra
+	lw $ra,20($sp)
+	lw $sp,16($sp)
+	jr $ra
 test_array:
 	sw $sp,-4($sp)
 	sw $ra,0($sp)
-	addi $sp,$sp,-144
+	addi $sp,$sp,-180
 	li $t0,0
 	sw $t0,8($sp)
 	lw $t0,8($sp)
-	sw $t0,92($sp)
+	sw $t0,124($sp)
 $label11:
-	lw $t0,92($sp)
+	lw $t0,124($sp)
 	sw $t0,16($sp)
 	li $t0,10
 	sw $t0,24($sp)
@@ -244,20 +245,21 @@ $label11:
 $label10:
 	li $t0,1
 	sw $t0,28($sp)
-	lw $t0,92($sp)
+	lw $t0,124($sp)
 	lw $t1,28($sp)
 	add $t0,$t0,$t1
-	sw $t0,92($sp)
+	sw $t0,124($sp)
 	 j $label11
 $label9:
-	lw $t0,92($sp)
+	lw $t0,124($sp)
 	sw $t0,36($sp)
-	lw $t0,92($sp)
+	lw $t0,124($sp)
 	sw $t0,44($sp)
 	lw $t0,36($sp)
 	li $t1,2
 	sllv $t0,$t0,$t1
-	li $t1,96
+	li $t1,128
+	add $t1,$sp,$t1
 	add $t0,$t0,$t1
 	lw $t2,44($sp)
 	sw $t2,0($t0)
@@ -269,9 +271,9 @@ $label8:
 	li $t0,0
 	sw $t0,52($sp)
 	lw $t0,52($sp)
-	sw $t0,92($sp)
+	sw $t0,124($sp)
 $label15:
-	lw $t0,92($sp)
+	lw $t0,124($sp)
 	sw $t0,60($sp)
 	li $t0,10
 	sw $t0,68($sp)
@@ -284,29 +286,58 @@ $label15:
 $label14:
 	li $t0,1
 	sw $t0,72($sp)
-	lw $t0,92($sp)
+	lw $t0,124($sp)
 	lw $t1,72($sp)
 	add $t0,$t0,$t1
-	sw $t0,92($sp)
+	sw $t0,124($sp)
 	 j $label15
 $label13:
-	lw $t0,92($sp)
-	sw $t0,84($sp)
-	lw $t0,84($sp)
+	li $t0,0
+	sw $t0,80($sp)
+	lw $t0,80($sp)
+	sw $t0,120($sp)
+$label19:
+	lw $t0,120($sp)
+	sw $t0,88($sp)
+	lw $t0,124($sp)
+	sw $t0,96($sp)
+	lw $t0,88($sp)
+	lw $t1,96($sp)
+	sub $t0,$t1,$t0
+	bgtz $t0,$label17
+	nop
+	 j $label16
+$label18:
+	li $t0,1
+	sw $t0,100($sp)
+	lw $t0,120($sp)
+	lw $t1,100($sp)
+	add $t0,$t0,$t1
+	sw $t0,120($sp)
+	 j $label19
+$label17:
+	lw $t0,120($sp)
+	sw $t0,112($sp)
+	lw $t0,112($sp)
 	li $t1,2
 	sllv $t0,$t0,$t1
-	sub $t0,$zero,$t0
-	li $t1,96
+	li $t1,128
+	add $t1,$sp,$t1
 	add $t0,$t0,$t1
 	lw $t1,0($t0)
-	sw $t1,88($sp)
-	lw $a0,88($sp)
+	sw $t1,116($sp)
+	lw $a0,116($sp)
 	li $v0,1
+	syscall
+	 j $label18
+$label16:
+	li $v0,4
+	la $a0,$str4
 	syscall
 	 j $label14
 $label12:
-	lw $ra,144($sp)
-	lw $sp,140($sp)
+	lw $ra,180($sp)
+	lw $sp,176($sp)
 	jr $ra
 main:
 	sw $sp,-4($sp)
@@ -346,28 +377,28 @@ main_start:
 	sw $t0,48($sp)
 	lw $t0,40($sp)
 	lw $t1,48($sp)
-	beq $t0,$t1,$label16
+	beq $t0,$t1,$label20
 	nop
-	 j $label17
-$label16:
-	li $v0,4
-	la $a0,$str4
-	syscall
-	 j $label18
-$label17:
+	 j $label21
+$label20:
 	li $v0,4
 	la $a0,$str5
 	syscall
-$label18:
+	 j $label22
+$label21:
 	li $v0,4
 	la $a0,$str6
 	syscall
+$label22:
 	li $v0,4
 	la $a0,$str7
 	syscall
-	jal test_scanf
 	li $v0,4
 	la $a0,$str8
+	syscall
+	jal test_scanf
+	li $v0,4
+	la $a0,$str9
 	syscall
 	li $t0,4
 	sw $t0,60($sp)
@@ -383,22 +414,24 @@ $label18:
 	li $v0,1
 	syscall
 	li $v0,4
-	la $a0,$str9
-	syscall
-	li $v0,4
 	la $a0,$str10
 	syscall
-	jal test_cycle
-	sw $v1,1667526245($sp)
 	li $v0,4
 	la $a0,$str11
 	syscall
+	jal test_cycle
 	li $v0,4
 	la $a0,$str12
 	syscall
-	jal test_array
 	li $v0,4
 	la $a0,$str13
+	syscall
+	li $v0,5
+	syscall
+	sw $v0,80($sp)
+	jal test_array
+	li $v0,4
+	la $a0,$str14
 	syscall
 	lw $ra,96($sp)
 	lw $sp,92($sp)

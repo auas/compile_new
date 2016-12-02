@@ -83,6 +83,7 @@ void mips::gen_mips(){
         else if(tmp_code->op == "end_func"){
           if(sr1->cat==5)
             SW(v(1),sr2);
+          cout<<"@@@@@@????@@@@@@@  "<<sr1->name<<" "<<sr1->cat<<endl;
         }
         else if(tmp_code->op == "return"){
 
@@ -407,10 +408,12 @@ void mips::mips_get_array(symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
   sllv(t(0),t(0),t(1));
 
   if(sr1->typ!=4){
-    sub(t(0),"$zero",t(0));
+    //sub(t(0),"$zero",t(0));
+    ;
   }
 
   li(t(1),int2str(sr1->addr));
+  add(t(1),sp(),t(1));
   add(t(0),t(0),t(1));
   lw(t(1),shift(0,t(0)));
   SW(t(1),dst);
@@ -428,6 +431,7 @@ void mips::mips_set_array(symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
   }
 
   li(t(1),int2str(sr1->addr));
+  add(t(1),sp(),t(1));
   add(t(0),t(0),t(1));
   LW(t(2),dst);
   sw(t(2),shift(0,t(0)));

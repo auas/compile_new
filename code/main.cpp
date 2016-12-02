@@ -47,7 +47,7 @@ int main()
    // mytab.showStab(0,mytab.getSbl_idx());
     cout<<"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
     mytab.showBtab("func1");
-    mytab.showBtab("func2");
+    mytab.showBtab("test_array");
     cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
     bk.showGlob();
     cout<<"######################################"<<endl;
