@@ -1,35 +1,28 @@
-const int g1=1,g2=2;
-const char g3='c';
-int a,b[10],c;
-char d[2],ch;
-int func1(int fa,int fb){
-int a;
-  int f11;
-  char f22;
-a = 1+2*(a+f11)*f22;
-for(a=1;a<100;a=a+1){
-printf("sdfsd",a);
+int bb;
+int a[10];
+int cc;
+void test_gb_array(){
+	int i;
+	for(i=0;i<10;i=i+1){
+		a[i] = i*i;
+		printf("\n*11*\n",a[i]);
+	}
+	for(i=0;i<10;i=i+1){
+		printf("\n&11&\n",a[i]);
+	}
 }
-  return f11;
+void test_loca_array(){
+	int i,b[10],c;
+	for(i=0;i<10;i=i+1){
+		b[i] = i*i+1;
+		printf("\n*11*\n",b[i]);
+	}
+	for(i=0;i<10;i=i+1){
+		printf("\n&11&\n",b[i]);
+	}
 }
-
-void func2(char ffa,char ffb){
-  int f21;
-  char f22;
-}
-
 void main(){
-  int aaa;
-  char b;
-  int c[10];
-  aaa = 3+func1(1,2+2*(3+7))*aaa;
-  c[aaa] = aaa;
-  do{
-    if(g1>0){
-      b = c+1;
-    }
-    else{
-      b=0;
-    }
-  }while((aaa*3+1)>b)
+	test_gb_array();
+	test_loca_array();
+
 }

@@ -109,7 +109,13 @@ void mips::gen_mips(){
           jr(ra());
         }
         else if(tmp_code->op == "read"){
-          li(v(0),int2str(5));
+          if(sr1->typ == 2){
+            li(v(0),int2str(12));
+          }
+          else{
+            li(v(0),int2str(5));
+          }
+
           outfile<<"\tsyscall"<<endl;
           SW(v(0),sr1);
         }
@@ -405,10 +411,10 @@ void mips::mips_times(symbolTab* sr1,symbolTab* sr2,symbolTab* sr3){
   outfile<<"\tmflo "<<t(0).c_str()<<endl;
   SW(t(0),sr2);
 }
-void mips::mips_slash(symbolTab* sr1,symbolTab* sr2,symbolTab* sr3){
+void mips::mips_slash(symbolTab* sr1,symbolTab* sr2,symbolTab* sr3){ // sr2/sr2
   LW(t(0),sr1);
   LW(t(1),sr2);
-  div(t(0),t(1));
+  div(t(1),t(0));
   outfile<<"\tmflo "<<t(0).c_str()<<endl;
   SW(t(0),sr2);
 }
@@ -417,13 +423,23 @@ void mips::mips_get_array(symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
   li(t(1),"2");
   sllv(t(0),t(0),t(1));
 
+  if(sr1->cat==7){
+    //sub(t(0),"$0",t(0));
+    li(t(1),int2str(sr1->addr));
+    add(t(1),gb(),t(1));
+    add(t(0),t(0),t(1));
+    lw(t(1),shift(0,t(0)));
+    SW(t(1),dst);
+  }
 
+  else{
+    li(t(1),int2str(sr1->addr));
+    add(t(1),sp(),t(1));
+    add(t(0),t(0),t(1));
+    lw(t(1),shift(0,t(0)));
+    SW(t(1),dst);
+  }
 
-  li(t(1),int2str(sr1->addr));
-  add(t(1),sp(),t(1));
-  add(t(0),t(0),t(1));
-  lw(t(1),shift(0,t(0)));
-  SW(t(1),dst);
 
 }
 
@@ -432,12 +448,22 @@ void mips::mips_set_array(symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
   li(t(1),"2");
   sllv(t(0),t(0),t(1));
 
+  if(sr1->cat==7){
+    //sub(t(0),"$0",t(0));
+    li(t(1),int2str(sr1->addr));
+    add(t(1),gb(),t(1));
+    add(t(0),t(0),t(1));
+    LW(t(2),dst);
+    sw(t(2),shift(0,t(0)));
+  }
+  else{
+    li(t(1),int2str(sr1->addr));
+    add(t(1),sp(),t(1));
+    add(t(0),t(0),t(1));
+    LW(t(2),dst);
+    sw(t(2),shift(0,t(0)));
+  }
 
-  li(t(1),int2str(sr1->addr));
-  add(t(1),sp(),t(1));
-  add(t(0),t(0),t(1));
-  LW(t(2),dst);
-  sw(t(2),shift(0,t(0)));
 
 
 }
