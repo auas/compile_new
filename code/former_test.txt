@@ -1,0 +1,41 @@
+const int g1=1,g2=2;
+const char g3='c';
+int a,b[10],c;
+char d[2],ch;
+int func1(int fa,int fb){
+int a;
+  int f11;
+  char f22;
+a = 1+2*(a+f11)*f22;
+for(a=1;a<100;a=a+1){
+printf("sdfsd",a);
+}
+  return (f11);
+}
+
+void func2(char ffa,char ffb){
+  int f21;
+  char f22;
+return;
+}
+
+void main(){
+  int aaa;
+  char b1;
+  int c[10];
+  for(aaa=1;a<100;a=a+1){
+    printf("sdfsd",a);
+    scanf(c,b1);	
+  }
+  func1(1,2);
+  do{
+    if(g1>0){
+      b1 = c+1;
+    }
+    else{
+      b1=0;
+    }
+  }while((aaa*3+1)>b)
+aaa = 3+func1(1,2+2*(3+7))*aaa;
+return
+}

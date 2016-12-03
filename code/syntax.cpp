@@ -58,7 +58,7 @@ char syntax::get_ch(){
 }
 void syntax::get_token(){
     //cout<<"******************"<<endl;
-    cout<<"@@@"<<tmp_token<<endl;
+
     while(pass(tmp_ch)){
       // pass if ' 'or'\n'
       get_ch();
@@ -242,6 +242,7 @@ void syntax::get_token(){
     */
     //cout<<"token is: "<<tmp_token<<endl;
     //cout<<"typ is: "<<typ<<endl;
+    cout<<"@@@"<<tmp_token<<endl;
 
 }
 void syntax::cpy_token(int st,int ed){
@@ -336,10 +337,3 @@ int syntax::str2num(string s,bool p){//p>0,+,else -
         a=-a;
     return a;
 }
-
-
-
-
-
-
-

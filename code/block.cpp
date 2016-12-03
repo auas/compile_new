@@ -26,9 +26,9 @@ block::block(){
     end_all_stab_indx = 0; //符号表中最后一项+1
     lab_cnst = new symbolTab; // const def lab
     lab_cnst->name = "const_lab";
-    lab_cnst->typ = 5;
+    lab_cnst->cat = 9;
     lab_cnst->ref = 0;
-    lab_cnst->cat = 0;
+    lab_cnst->typ = 0;
 
 }
 
@@ -54,10 +54,16 @@ void block::expression(symbolTab* &tmp){
     //genTmp.getTmpVar(tmp_1)
     term(sr1);
     //string op;
+    if((tmp->typ==2)&&(sr1->typ==2)){
+      ;
+    }
+    else{
+      tmp->typ = 1;
+    }
     mdF.gen_mid_code(op,tmp,sr1,tmp);
   }
 
-cout<<"$$$$"<<tmp->name<<endl;
+  cout<<"$$$$"<<tmp->name<<endl;
 }//表达式
 
 void block::term(symbolTab* &tmp){
@@ -67,6 +73,12 @@ void block::term(symbolTab* &tmp){
     syn.get_token();
     symbolTab* sr1 = new symbolTab;
     factor(sr1);
+    if((sr1->typ==2)&&(tmp->typ==2)){
+      tmp->typ = 2;
+    }
+    else{
+      tmp->typ = 1;
+    }
     mdF.gen_mid_code(s,sr1,tmp,tmp);
   }
   cout<<"there is a term"<<endl;
@@ -79,7 +91,8 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
     genTmp.getTmpVar(tmp); //!!!!!!!!!!!!!!!!!!!!! TO CHECK!!
     symbolTab* sr1 = new symbolTab;
     sr1->name = syn.tmp_token;
-    sr1->typ = 5;
+    sr1->typ = 1;
+    sr1->cat = 8;
     //cout<<"%%%%%%%^^^^^^^^^^^^^^^%%%%%  "<<dst->name<<endl;
     //while(1);
     //cout<<"###############   "<<tmp->name.c_str()<<endl;
@@ -91,15 +104,24 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
     //cout<<"#######   "<<syn.tmp_token<<endl;
 
   }
-  else if(syn.typ=="charsym"){ // to transform!!
+  else if(syn.typ=="char"){ // to transform!!
 
     //cout<<"#######    "<<syn.tmp_token<<endl;
     tmp = new symbolTab;
     genTmp.getTmpVar(tmp);
     symbolTab* sr1 = new symbolTab;
     sr1->name = syn.tmp_token;
-    sr1->typ = 5;
-    //cout<<"%%%%%%%^^^^^^^^^^^^^^^%%%%%  "<<dst->name<<endl;
+    sr1->typ = 2;
+    sr1->cat = 8;
+    sr1->ref = int(syn.tmp_token[0]);
+
+    char tmp_val[100];
+    sprintf(tmp_val,"%d",int(syn.tmp_token[0]));
+    string temp1_(tmp_val);
+    sr1->name = temp1_;
+
+    cout<<"################# char ############ values:  "<<sr1->ref<<endl;
+    tmp->typ=2;
     //while(1);
     //cout<<"###############   "<<tmp->name.c_str()<<endl;
     //string op = "set_I";
@@ -133,13 +155,18 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
         sr1 = check_sbl(funcName,name);
         check_array(sr1); // insure is an array
         symbolTab* sr2 = new symbolTab;
+        sr2->typ = 0;
+        sr2->cat = 8;
+        sr2->ref = 0;
         expression(sr2);
         if(syn.typ!="rsquare"){
           errormsg("no rsquare in factor",syn.tmp_token);
         }
         else{
           genTmp.getTmpVar(tmp);
+          tmp->typ = sr1->typ;
           string op = "get_array";
+          tmp->typ = sr1->typ;
           mdF.gen_mid_code(op,sr1,sr2,tmp);
           syn.get_token();
           return;
@@ -168,13 +195,14 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
           else{
             syn.get_token();
           }
+          tmp = new symbolTab;
           callRet(tmp1,tmp);
-      /*
-          if (syn.typ!="rparen"){
+            /*
+                if (syn.typ!="rparen"){
 
-            errormsg("losing rparen in func calling",syn.tmp_token);
-          }
-      */
+                  errormsg("losing rparen in func calling",syn.tmp_token);
+                }
+            */
           if(0);
           else{
             cout<<"auas is there!"<<endl;
@@ -191,6 +219,8 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
           symbolTab* sr1;
           sr1 = check_sbl(funcName, name);
           //string op = "load";
+          tmp->typ = sr1->typ;
+          cout<<"***@@@@@@@@@@@***"<<sr1->name<<sr1->typ<<endl;
           mdF.gen_mid_code("set",tmp,sr1);
           //tmp = sr1;
           return;
@@ -198,6 +228,7 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
     }
 
   else{
+    cout<<syn.typ<<endl;
     errormsg("ill factor",syn.tmp_token);
   }
 
@@ -258,7 +289,8 @@ void block::const_auas(){
   if(chq){
     symbolTab* sr1 = new symbolTab;
     sr1->name = "main_start";
-    sr1->typ = 5;
+    sr1->cat = 9; // is a lab
+    sr1->typ = 0;// void typ
     mdF.gen_mid_code("goto",sr1);
   }
 
@@ -280,9 +312,10 @@ void block::constDef(){
       int interger_val = integer();
       //todo :登陆符号表！！ 具体数值暂时没有登陆！！！
       symbolTab* sr1;
-      sr1 = mytab.enterCnst(1,cnst_name);//syn.get_token(); 在integer()中完成
+      sr1 = mytab.enterCnst(1,cnst_name);//syn.get_token(); 在integer()中完成 is int
       symbolTab* sr2 = new symbolTab;
-      sr2->typ = 3;
+      sr2->typ = sr1->typ; //
+      sr2->cat = 8;// is a tmp
       sr2->name = "store_cnst";
       sr2->ref = interger_val;
       mdF.gen_mid_code("cnst",sr1,sr2);
@@ -311,7 +344,8 @@ void block::constDef(){
       symbolTab* sr1;
       sr1 = mytab.enterCnst(2,cnst_name);//syn.get_token(); 在integer()中完成
       symbolTab* sr2 = new symbolTab;
-      sr2->typ = 3;
+      sr2->cat = 8;
+      sr2->typ = sr1->typ;
       sr2->name = "store_cnst";
       sr2->ref = int(syn.tmp_token[0]);
       mdF.gen_mid_code("cnst",sr1,sr2);
@@ -795,7 +829,8 @@ void block::forSent(){
                           symbolTab* ttmp = new symbolTab;
                           ttmp->name = syn.tmp_token;
                           //???##$$
-                          ttmp->typ = 5;
+                          ttmp->typ = 1;
+                          ttmp->cat = 8;
 
                           symbolTab* sr2 = new symbolTab;
                           genTmp.getTmpVar(sr2);
@@ -1263,7 +1298,8 @@ void block::mainFunc(){
     mdF.gen_mid_code("goto",lab_cnst);
     symbolTab* m = new symbolTab;
     m->name = "main_start";
-    m->typ = 5;
+    m->cat = 9;
+    m->typ = 0;
     mdF.gen_mid_code("set_lab",m);
 
   int p1_num = 0;
@@ -1405,7 +1441,7 @@ symbolTab* block::check_sbl(string name){
 }
 
 
-void block::callRet(symbolTab* func,symbolTab* tmp){
+void block::callRet(symbolTab* func,symbolTab* &tmp){
   //syn.get_token();
   if(syn.typ=="rparen"){
     syn.get_token();
@@ -1444,6 +1480,7 @@ void block::callRet(symbolTab* func,symbolTab* tmp){
 
   }
   genTmp.getTmpVar(tmp);
+  tmp->typ = func->typ;
   mdF.gen_mid_code("end_func",func,tmp);
 
 }

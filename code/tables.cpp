@@ -268,14 +268,7 @@ symbolTab* tables::cheq_stab(string name,int a,int b){ //在中找a<x<=b name
     if(stab[i].name == name){
       ret = &stab[i];
       return ret;
-      /*
-      ret->name = stab[i].name;
-      ret->cat = stab[i].cat;
-      ret->typ = stab[i].typ;
-      ret->ref = stab[i].ref;
-      ret->addr = stab[i].addr;
-      */
-      //return ret;
+
     }
   }
   symbolTab* null = new symbolTab;
@@ -290,18 +283,13 @@ symbolTab* tables::cheq_stab(string name){
       if(stab[i].name==name){
         ret  = &stab[i];
         return ret;
-        /*
-        ret->name = stab[i].name;
-        ret->cat = stab[i].cat;
-        ret->typ = stab[i].typ;
-        ret->ref = stab[i].ref;
-        ret->addr = stab[i].addr;
-        */
+
       }
       else{
         symbolTab* null = new symbolTab;
         ret = null;
         ret->name ="#null";
+
         return ret;
       }
   }
@@ -394,6 +382,6 @@ void tables::get_addr_gb(){
       addr+=get_array_len(stab[i].ref); //return array len
       stab[i].addr = 4*addr;
     }
-    stab[i].typ = 4;
+    stab[i].cat = 7;
   }
 }

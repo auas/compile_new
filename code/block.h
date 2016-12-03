@@ -66,7 +66,7 @@ class block{
       void term(symbolTab* &ret);//项
       void factor(symbolTab* &ret);//因子
 
-      void callRet(symbolTab* func,symbolTab* ret);//有返回值的函数调用
+      void callRet(symbolTab* func,symbolTab* &ret);//有返回值的函数调用
       void callVoid();//无返回值的函数调用
 
       void valList();//值参数表

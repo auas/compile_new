@@ -1,41 +1,89 @@
-const int g1=1,g2=2;
-const char g3='c';
-int a,b[10],c;
-char d[2],ch;
-int func1(int fa,int fb){
 int a;
-  int f11;
-  char f22;
-a = 1+2*(a+f11)*f22;
-for(a=1;a<100;a=a+1){
-printf("sdfsd",a);
+char test_ch,test_ch_array[4];
+
+
+int test_exp(){
+  int a1;
+  int a2;
+  a1 = 1+3*(5+6);
+  a2 = a1*3+a1;
+  return(a2+1);
 }
-  return (f11);
+int test_func(int n){
+  int ret;
+  if(n==1)
+    return(1);
+  ret = n*test_func(n-1);
+  return (ret);
 }
 
-void func2(char ffa,char ffb){
-  int f21;
-  char f22;
-return;
+void test_cycle(){
+  int i;
+  for(i=0;i<4;i=i+1){
+    printf(i);
+  }
+  do{
+    printf(i);
+    i=i+1;
+  }while(i<10)
+}
+void test_scanf(){
+  printf("hello!\n");
+  printf("enter an int\n");
+  scanf(a);
+  printf("\n you enter: ",a);
+  return;
+}
+void test_array(){
+  int c;
+  int a[10];
+  int i,j;
+  for(i=0;i<10;i=i+1){
+    a[i] = i;
+  }
+  printf("show array result");
+  for(i=0;i<10;i=i+1){
+    for(j=0;j<i;j=j+1){
+      printf(a[j]);
+    }
+    printf("\n*\n");
+  }
 }
 
 void main(){
-  int aaa;
-  char b1;
-  int c[10];
-  for(aaa=1;a<100;a=a+1){
-    printf("sdfsd",a);
-    scanf(c,b1);	
-  }
-  func1(1,2);
-  do{
-    if(g1>0){
-      b1 = c+1;
-    }
-    else{
-      b1=0;
-    }
-  }while((aaa*3+1)>b)
-aaa = 3+func1(1,2+2*(3+7))*aaa;
-return
+  int b;
+  int c;
+  b = 1+2*3;
+  test_ch = 'A';
+  printf("\nch= ",test_ch);
+  test_ch_array[0] = 'b';
+  test_ch_array[1] = '1'*2;
+  test_ch_array[2] = '1'+'0';
+  printf("\nch_arr[2]= ",test_ch_array[2]);
+  printf("\nch_arr[1]= ",test_ch_array[1]);
+  printf("\nch_arr[0]= ",test_ch_array[0]);
+  
+  c = test_exp();
+  printf(c);
+  if(c==137)
+    printf("right with test_exp\n");
+  else
+    printf("wrong with test_exp\n");
+  printf("finish test_exp\n");
+
+  printf("start testing scanf\n");
+  test_scanf();
+  printf("\n start testing func\n");
+  b = test_func(4);
+  printf(b);
+  printf("end testing func\n");
+  printf("start testing cycle\n");
+  test_cycle();
+  printf("\nend testing cycle\n");
+
+  printf("start testing array\n");
+  scanf(b);
+  test_array();
+  printf("\nend testing array\n");
+  return;
 }

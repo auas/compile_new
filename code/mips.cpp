@@ -40,7 +40,14 @@ void mips::gen_mips(){
         }
         else if(tmp_code->op == "set_I"){
           //int val = syn.str2num(sr1->name,1);
-          mips_set_I(sr2,sr1->name);
+          if(sr2->typ==2){
+            int sft = 0;
+            sft = sr2->addr;
+            li(t(0),int2str(sr1->ref));
+            SW(t(0),sr2);
+          }
+          else
+            mips_set_I(sr2,sr1->name);
         }
         else if(tmp_code->op == "set_func_Lab"){
             outfile<<sr1->name.c_str()<<":"<<endl;
@@ -115,7 +122,10 @@ void mips::gen_mips(){
         }
         else if(tmp_code->op == "write_exp"){
           LW(a(0),sr1);
-          li(v(0),int2str(1));
+          if(sr1->typ == 2)
+            li(v(0),int2str(11));
+          else
+            li(v(0),int2str(1));
           outfile<<"\tsyscall"<<endl;
         }
         else if(tmp_code->op == "bnez"){
@@ -350,7 +360,7 @@ string mips::str(string s){
 }
 
 void mips::LW(string s,symbolTab* sr1){
-  if(sr1->typ==4){
+  if(sr1->cat==7){
     lw(s,shift(sr1->addr,gb()));
   }
   else{
@@ -358,7 +368,7 @@ void mips::LW(string s,symbolTab* sr1){
   }
 }
 void mips::SW(string s,symbolTab* sr1){
-  if(sr1->typ==4){
+  if(sr1->cat==7){
     sw(s,shift(sr1->addr,gb()));
   }
   else{
@@ -407,10 +417,7 @@ void mips::mips_get_array(symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
   li(t(1),"2");
   sllv(t(0),t(0),t(1));
 
-  if(sr1->typ!=4){
-    //sub(t(0),"$zero",t(0));
-    ;
-  }
+
 
   li(t(1),int2str(sr1->addr));
   add(t(1),sp(),t(1));
@@ -425,10 +432,6 @@ void mips::mips_set_array(symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
   li(t(1),"2");
   sllv(t(0),t(0),t(1));
 
-  if(sr1->typ!=4){
-    //sub(t(0),"$zero",t(0));
-    ;
-  }
 
   li(t(1),int2str(sr1->addr));
   add(t(1),sp(),t(1));

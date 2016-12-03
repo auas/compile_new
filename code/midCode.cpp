@@ -20,8 +20,8 @@ void genTmpVar::getTmpVar(symbolTab* tmp){ //Ĭ��Ϊint ���͵ı���
     string name = getName();
     tmp->name = name;
     //cout<<"%%&&^^%%"<<name<<endl;
-    tmp->cat = 2;
-    tmp->typ = 3;
+    tmp->cat = 8;
+    tmp->typ = 0;
     tmp->ref = 0;
     tmp->addr = (num)*4;//record it's addr!
 }
@@ -47,8 +47,8 @@ string genLabel::getName(){
 void genLabel::getLabel(symbolTab* tmp){
   string name = getName();
   tmp->name = name;
-  tmp->cat = 0;
-  tmp->typ = 5;
+  tmp->cat = 9;
+  tmp->typ = 0;
   tmp->ref = 0;
 }
 
@@ -80,8 +80,6 @@ void midCodeFunc::gen_mid_code(string op,symbolTab* sr1){
   midCode* tmp_code = new midCode;
   mytab.ctab[mytab.ctl_idx] = tmp_code;
   tmp_code->op = op;
-
-
   tmp_code->sr1 = sr1;
   tmp_code->typ = 1;
   mytab.ctl_idx++;
@@ -101,49 +99,17 @@ cout<<"%%%%%%%%%%^^^^^^^ 2 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
   //cout<<"$$$$$$$$$$$$$$$$$$$$$$   "<<sr1->name.c_str()<<endl;
   //cout<<"$$$$$$$$$$$$$$$$$$$$$$   "<<sr2->name.c_str()<<endl;
   mytab.ctl_idx++;
-  /*
-  switch(op):
-    case "set_I":{
-      tmp_code->op = "set_I";
-      tmp_code->sr1 = sr1;
-      tmp_code->dst = dst;
-      mytab.ctl_idx++;
-      break;
-    }
-  */
 
-  //mytab.ctl_idx++;
 }
 void midCodeFunc::gen_mid_code(string op,symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
 cout<<"%%%%%%%%%%^^^^^^^ 3 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
   midCode* tmp_code = new midCode;
   mytab.ctab[mytab.ctl_idx] = tmp_code;
-
-
   tmp_code->op = op;
   tmp_code->sr1 = sr1;
   tmp_code->sr2 = sr2;
   tmp_code->dst = dst;
   tmp_code->typ = 3;
   mytab.ctl_idx++;
-  /*
-  switch(op):
-    case "get_array":{
-      tmp_code->op = "get_array";
-      tmp_code->sr1 = sr1;
-      tmp_code->sr2 = sr2;
-      tmp_code->dst = dst;
-      mytab.ctl_idx++;
-      break;
-    }
-    case "times":{
-      tmp_code->op = "times";
-      tmp_code->sr1 = sr1;
-      tmp_code->sr2 = sr2;
-      tmp_code->dst = dst;
-      mytab.ctl_idx++;
-      break;
-    }
-    //mytab.ctl_idx++;
-  */
+
 }
