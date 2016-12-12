@@ -35,6 +35,8 @@
 		<Unit filename="add.h" />
 		<Unit filename="block.cpp" />
 		<Unit filename="block.h" />
+		<Unit filename="error.cpp" />
+		<Unit filename="error.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="midCode.cpp" />
 		<Unit filename="midCode.h" />

@@ -6,12 +6,15 @@
 #include "block.h"
 #include "tables.h"
 #include "midCode.h"
+#include <set>
+#include "error.h"
 
 extern class syntax syn;
 extern class tables mytab;
 extern class genTmpVar genTmp;
 extern class genLabel genLb;
 extern class midCodeFunc mdF;
+extern class error err;
 block::block(){
     startP1 = 0;
     c_addr=0;
@@ -50,10 +53,7 @@ void block::expression(symbolTab* &tmp){
     string op = syn.typ;
     syn.get_token();
     symbolTab* sr1 = new symbolTab;
-    //symbolTab* tmp_1=new symbolTab;
-    //genTmp.getTmpVar(tmp_1)
     term(sr1);
-    //string op;
     if((tmp->typ==2)&&(sr1->typ==2)){
       ;
     }
@@ -62,8 +62,6 @@ void block::expression(symbolTab* &tmp){
     }
     mdF.gen_mid_code(op,tmp,sr1,tmp);
   }
-
-  cout<<"$$$$"<<tmp->name<<endl;
 }//表达式
 
 void block::term(symbolTab* &tmp){
@@ -81,31 +79,22 @@ void block::term(symbolTab* &tmp){
     }
     mdF.gen_mid_code(s,sr1,tmp,tmp);
   }
-  cout<<"there is a term"<<endl;
+  //cout<<"there is a term"<<endl;
 }//项
 void block::factor(symbolTab* &tmp){ // !!unfinished!!
-  cout<<"there is a factor"<<endl;
+  //cout<<"there is a factor"<<endl;
   if(syn.typ=="numsym"){//more to check symble table!
-    //cout<<"#######   "<<syn.tmp_token<<endl;
     tmp = new symbolTab;
     genTmp.getTmpVar(tmp); //!!!!!!!!!!!!!!!!!!!!! TO CHECK!!
     symbolTab* sr1 = new symbolTab;
     sr1->name = syn.tmp_token;
     sr1->typ = 1;
     sr1->cat = 8;
-    //cout<<"%%%%%%%^^^^^^^^^^^^^^^%%%%%  "<<dst->name<<endl;
-    //while(1);
-    //cout<<"###############   "<<tmp->name.c_str()<<endl;
-    //string op_1((char*)("set_I"));
     mdF.gen_mid_code("set_I",sr1,tmp);
     syn.get_token();
     return;
-    //while(1);
-    //cout<<"#######   "<<syn.tmp_token<<endl;
-
   }
   else if(syn.typ=="char"){ // to transform!!
-
     //cout<<"#######    "<<syn.tmp_token<<endl;
     tmp = new symbolTab;
     genTmp.getTmpVar(tmp);
@@ -120,15 +109,10 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
     string temp1_(tmp_val);
     sr1->name = temp1_;
 
-    cout<<"################# char ############ values:  "<<sr1->ref<<endl;
+    //cout<<"################# char ############ values:  "<<sr1->ref<<endl;
     tmp->typ=2;
-    //while(1);
-    //cout<<"###############   "<<tmp->name.c_str()<<endl;
-    //string op = "set_I";
     mdF.gen_mid_code("set_I",sr1,tmp);
     syn.get_token();
-    //while(1);
-    //cout<<"#######   "<<syn.tmp_token<<endl;
     return;
 
   }
@@ -137,21 +121,27 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
     expression(tmp);
     if(syn.typ!="rparen"){
       errormsg("no rparen in factor",syn.tmp_token);
+      err.errormsg(2);
+      set<string> s;
+      s = err.initSet();
+      s.insert("plus");
+      s.insert("minus");
+      s.insert("times");
+      s.insert("slash");
+      s.insert("rparen");
+      err.test(s);
     }
-    else{
+    if(syn.typ=="rparen"){
       syn.get_token();
       return;
     }
   }
   else if(syn.typ=="idnt"){
       name = syn.tmp_token;
-      //lookwp!! tables!
       syn.get_token();
       if(syn.typ=="lsquare"){
         syn.get_token();
-        //symbolTab* sr1 = new symbolTab;
         symbolTab* sr1;
-        //sr1 = check_sbl(funcName, name);
         sr1 = check_sbl(funcName,name);
         check_array(sr1); // insure is an array
         symbolTab* sr2 = new symbolTab;
@@ -161,6 +151,16 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
         expression(sr2);
         if(syn.typ!="rsquare"){
           errormsg("no rsquare in factor",syn.tmp_token);
+          err.errormsg(6);
+          if(isDown(syn.typ)){
+            syn.get_token();
+          }
+          genTmp.getTmpVar(tmp);
+          tmp->typ = sr1->typ;
+          string op = "get_array";
+          tmp->typ = sr1->typ;
+          mdF.gen_mid_code(op,sr1,sr2,tmp);
+          return;
         }
         else{
           genTmp.getTmpVar(tmp);
@@ -173,63 +173,117 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
         }
       }
       else if(syn.typ=="lparen"){
-        //errormsg("no def func calling ! to fix",name);
-        // chack if callable and with return value
-        //bool cq = mytab.isReFunc(name);
-        //if (cq==0)
-        //symbolTab* tmp1 = new symbolTab;
         symbolTab* tmp1;
-        //mytab.cheq_stab(name,&tmp1);
         tmp1 = check_sbl(name);
 
         if((tmp1->name=="#null")||(tmp1->cat!=5)){
             cout<<tmp1->cat<<endl;
             errormsg("no def func calling ! to fix",tmp1->name);
+            err.errormsg(24);
+            set<string> s;
+            s = err.initSet();
+            s.insert("rparen");
+            err.test(s);
+            if(syn.typ=="rparen"){
+              syn.get_token();
+            }
+            tmp = new symbolTab;
+            tmp->name = "#null";
+            tmp->typ = 0;
+            return ; // ?? not sure!! to fix
         }
-
         else{
-          //syn.get_token();
           if(syn.typ!="lparen"){
             errormsg("lose lparen ",syn.tmp_token);
+            if(isUp(syn.typ)){
+              syn.get_token();
+            }
+            tmp = new symbolTab;
+            callRet(tmp1,tmp);
+            return ;
           }
           else{
             syn.get_token();
           }
           tmp = new symbolTab;
           callRet(tmp1,tmp);
-            /*
-                if (syn.typ!="rparen"){
-
-                  errormsg("losing rparen in func calling",syn.tmp_token);
-                }
-            */
-          if(0);
-          else{
-            cout<<"auas is there!"<<endl;
-            //syn.get_token();
-            return;
-          }
+          return;
         }
       }
       else{
-          //syn.get_token();
           //symbolTab* check_sbl(string funcName, string name);//根据函数名称查name的符号
           tmp = new symbolTab;
           genTmp.getTmpVar(tmp);
           symbolTab* sr1;
           sr1 = check_sbl(funcName, name);
           //string op = "load";
+          if(sr1->name =="#null"){
+            tmp->typ = 0;
+            return;
+          }
           tmp->typ = sr1->typ;
-          cout<<"***@@@@@@@@@@@***"<<sr1->name<<sr1->typ<<endl;
           mdF.gen_mid_code("set",tmp,sr1);
           //tmp = sr1;
           return;
       }
     }
+  else if((syn.typ=="plus")||(syn.typ=="minus")){
+    string op_tmp = syn.typ;
+    syn.get_token();
+    if(syn.typ!="numsym"){
+      err.errormsg(26);
+      tmp = new symbolTab;
+      genTmp.getTmpVar(tmp); //!!!!!!!!!!!!!!!!!!!!! TO CHECK!!
+      symbolTab* sr1 = new symbolTab;
+      sr1->name = "0";
+      sr1->typ = 1;
+      sr1->cat = 8;
+      mdF.gen_mid_code("set_I",sr1,tmp);
+      set<string> s;
+      s = err.initSet();
+      s.insert("plus");
+      s.insert("minus");
+      s.insert("times");
+      s.insert("slash");
+      err.test(s);
+      return;
+    }
+    else{
+      string str(syn.tmp_token);
+      string result;
+      if(op_tmp=="minus"){
+        result = "-"+str;
+      }
+      else{
+        result = str;
+      }
+      tmp = new symbolTab;
+      genTmp.getTmpVar(tmp); //!!!!!!!!!!!!!!!!!!!!! TO CHECK!!
+      symbolTab* sr1 = new symbolTab;
+      sr1->name = result;
+      sr1->typ = 1;
+      sr1->cat = 8;
+      mdF.gen_mid_code("set_I",sr1,tmp);
+      syn.get_token();
+      return;
+    }
 
+  }
   else{
     cout<<syn.typ<<endl;
     errormsg("ill factor",syn.tmp_token);
+    err.errormsg(26);
+    set<string> s;
+    s = err.initSet();
+    s.insert("times");
+    s.insert("slash");
+    s.insert("plus");
+    s.insert("minus");
+    err.test(s);
+    tmp = new symbolTab;
+    tmp->name = "#null";
+    tmp->typ = 0;
+    return;
   }
 
   //if()
@@ -241,8 +295,8 @@ int block::integer(){
   if(syn.typ=="minus"){
     syn.get_token();
     if(syn.typ!="numsym"){
-      cout<<"error!: 非法整数"<<endl;
-      while(1);
+      err.errormsg(10);
+      return 0;
     }
     ret = syn.str2num(syn.tmp_token,0);//0 负数！
     syn.get_token();
@@ -250,8 +304,8 @@ int block::integer(){
   else if(syn.typ=="plus"){
     syn.get_token();
     if(syn.typ!="numsym"){
-      cout<<"error!: 非法整数"<<endl;
-      while(1);
+      err.errormsg(10);
+      return 0;
     }
     ret = syn.str2num(syn.tmp_token,1);//0 负数！
     syn.get_token();
@@ -261,30 +315,39 @@ int block::integer(){
     syn.get_token();
   }
   else{
-    cout<<"error!: 非法整数"<<endl;
-    while(1);
+    err.errormsg(10);
+    return 0;
   }
   return ret;
 }//分析整数,返回值
 
 void block::const_auas(){
-  //＜常量说明＞ ::=  const＜常量定义＞;{ const＜常量定义＞;}
-  //cout<<syn.typ<<endl;
-  //cout<<syn.typ<<endl;
   int chq = 0;
   if(funcName=="start"){
     chq = 1;//mark it
     mdF.gen_mid_code("set_lab",lab_cnst);
+    /*
+    midCode* tmp_code = mytab.ctab[0];
+        symbolTab* sr1=tmp_code->sr1;
+        symbolTab* sr2=tmp_code->sr2;
+        symbolTab* dst=tmp_code->dst;
+        cout<<sr1->name<<" "<<endl;
+        cout<<sr2->name<<" "<<endl;
+        cout<<dst->name<<" "<<endl;
+        */
+
   }
   while(syn.typ=="constsym"){
     syn.get_token();
     constDef();
     if(syn.typ!="endcmd"){
-      cout<<"error! lose endcmd  "<<syn.tmp_token<<endl;
-      while(1);
+      err.errormsg(1);
+      if(isEnd(syn.typ)){
+        syn.get_token();
+      }
     }
     syn.get_token();
-    cout<<"there is a const declear"<<endl;
+  //  cout<<"there is a const declear"<<endl;
   }
   if(chq){
     symbolTab* sr1 = new symbolTab;
@@ -302,11 +365,22 @@ void block::constDef(){
       syn.get_token();
       if(syn.typ!="idnt"){
         cout<<"error!: in const int: ill idnt"<<endl;
+        err.errormsg(11);
+        set<string> s;
+        s = err.initSet();
+        s.insert("comma");
+        err.test(s);
+        continue;
       }
       string cnst_name = syn.tmp_token;
       syn.get_token();
       if(syn.typ!="become"){
-        cout<<"error!: in const int: ill become"<<endl;
+        err.errormsg(12);
+        set<string> s;
+        s = err.initSet();
+        s.insert("comma");
+        err.test(s);
+        continue;
       }
       syn.get_token();
       int interger_val = integer();
@@ -319,7 +393,7 @@ void block::constDef(){
       sr2->name = "store_cnst";
       sr2->ref = interger_val;
       mdF.gen_mid_code("cnst",sr1,sr2);
-      cout<<"name = "<<cnst_name<<" ## "<<"varvalue="<< interger_val<<endl;
+      //cout<<"name = "<<cnst_name<<" ## "<<"varvalue="<< interger_val<<endl;
       //syn.get_token();
     }while(syn.typ=="comma");
   }
@@ -328,17 +402,42 @@ void block::constDef(){
       syn.get_token();
       if(syn.typ!="idnt"){
         cout<<"error!: in const char: ill idnt"<<endl;
+        err.errormsg(11);
+        set<string> s;
+        s = err.initSet();
+        s.insert("comma");
+        err.test(s);
+        continue;
       }
       string cnst_name = syn.tmp_token;
       syn.get_token();
       if(syn.typ!="become"){
         cout<<"error!: in const char: ill become"<<endl;
-        while(1);
+        err.errormsg(12);
+        set<string> s;
+        s = err.initSet();
+        s.insert("comma");
+        err.test(s);
+        continue;
       }
       syn.get_token();
       if(syn.typ!="char"){
         cout<<"error!: in const int: ill typ char"<<endl;
-        while(1);
+        err.errormsg(13);
+        set<string> s;
+        s = err.initSet();
+        s.insert("comma");
+        err.test(s);
+        // set 0 as rest
+        symbolTab* sr1;
+        sr1 = mytab.enterCnst(2,cnst_name);//syn.get_token(); 在integer()中完成
+        symbolTab* sr2 = new symbolTab;
+        sr2->cat = 8;
+        sr2->typ = sr1->typ;
+        sr2->name = "store_cnst";
+        sr2->ref = 0;
+        mdF.gen_mid_code("cnst",sr1,sr2);
+        continue;
       }
       //todo :登陆符号表！！ 具体数值暂时没有登陆！！！
       symbolTab* sr1;
@@ -349,13 +448,17 @@ void block::constDef(){
       sr2->name = "store_cnst";
       sr2->ref = int(syn.tmp_token[0]);
       mdF.gen_mid_code("cnst",sr1,sr2);
-      cout<<"name = "<<cnst_name<<" ## "<<"varvalue="<< syn.tmp_token<<endl;
+      //cout<<"name = "<<cnst_name<<" ## "<<"varvalue="<< syn.tmp_token<<endl;
       syn.get_token();
     }while(syn.typ=="comma");
   }
   else{
     cout<<"error!: ill const def"<<endl;
-    while(1);
+    err.errormsg(12);
+    set<string> s;
+    s = err.initSet();
+    err.test(s);
+    return;
   }
 }//常量定义
 
@@ -363,8 +466,9 @@ void block::constDef(){
 void block::var(){
   //＜变量说明＞  ::= ＜变量定义＞;{＜变量定义＞;}
   do{
-    if(syn.typ=="endcmd")
+    if(syn.typ=="endcmd"){
       syn.get_token();
+    }
     varDef();
   }while(syn.typ=="endcmd");
   cout<<"there is a var def"<<endl;
@@ -399,8 +503,6 @@ void block::varDef(){
 
     }
   else{
-    //cout<<"error!:vardef: ill idnt 1 "<<syn.tmp_token<<endl;
-    //while(1);
     return;
   }
   do{
@@ -408,7 +510,11 @@ void block::varDef(){
       syn.get_token();
     if(syn.typ!="idnt"){
       cout<<"error!: vardef: ill idnt 2 "<<syn.tmp_token<<endl;
-      while(1);
+      err.errormsg(11);
+      set<string> s;
+      s = err.initSet();
+      s.insert("comma");
+      err.test(s);
     }
     else{
       name = syn.tmp_token;
@@ -417,18 +523,21 @@ void block::varDef(){
         {
         syn.get_token();
         int len = integer();
-        if(len<0){
+        if((len<0)||(len==0)){
           cout<<"arr_idx<0"<<endl;
-          while(1);
+          err.errormsg(14);
+          len = 1;
         }
         if(syn.typ!="rsquare"){
           cout<<"array lose rsquare"<<endl;
-          while(1);
+          err.errormsg(6);
+          set<string> s = err.initSet();
+          s.insert("comma");
+          err.test(s);
+          continue;
         }
-        // 登陆数组！！
-        //enterArry(int arrTyp,int len,int size_,string name);
         mytab.enterArry(Typ,len,((len*8)/Typ),name);
-        cout<<"var array def: "<<name<<" typ: "<<Typ<<endl;
+        //cout<<"var array def: "<<name<<" typ: "<<Typ<<endl;
         syn.get_token();
       }
       else if(syn.typ=="lparen") //是'('
@@ -437,7 +546,7 @@ void block::varDef(){
         }
       else{
         mytab.enterVar(Typ,name);//登陆值变量
-        cout<<"var def: "<<name<<" typ: "<<Typ<<endl;
+        //cout<<"var def: "<<name<<" typ: "<<Typ<<endl;
       }
     }
   }while(syn.typ=="comma");
@@ -458,7 +567,7 @@ void block::funcs(){
       Typ = 0;
       syn.get_token();
       if(syn.typ=="mainsym"){
-        cout<<"there is a main func"<<endl;
+        //cout<<"there is a main func"<<endl;
         syn.get_token();
         return;
       }
@@ -469,10 +578,19 @@ void block::funcs(){
       }
       else{
         cout<<"error!: func def ill idnt  "<<syn.tmp_token<<endl;
-        while(1);
+        err.errormsg(11);
+        set<string> s;
+
+        s.insert("voidsym");
+        s.insert("intsym");
+        s.insert("charsym");
+        s.insert("mainsym");
+        err.test_large(s);
+        continue;
       }
     }
     else if(syn.typ=="intsym"||syn.typ=="charsym"){
+      cout<<"&&& ret fuc"<<endl;
       if(syn.typ=="intsym"){
         Typ = 1;
       }
@@ -482,7 +600,15 @@ void block::funcs(){
       syn.get_token();
       if(syn.typ!="idnt"){
         cout<<"error!: func def ill idnt  "<<syn.tmp_token<<endl;
-        while(1);
+        err.errormsg(11);
+        set<string> s;
+
+        s.insert("voidsym");
+        s.insert("intsym");
+        s.insert("charsym");
+        s.insert("mainsym");
+        err.test_large(s);
+        continue;
       }
       else
         {
@@ -493,8 +619,21 @@ void block::funcs(){
 
     }
     else{
-      cout<<"error!: 非法函数定义，类型错误"<<endl;
-      while(1);
+      cout<<"error!:ill func declear"<<endl;
+      err.errormsg(15);
+      set<string> s;
+      s.insert("void");
+      s.insert("intsym");
+      s.insert("charsym");
+      s.insert("mainsym");
+      err.test_large(s); // don't take /n into consider!
+      if(syn.typ=="mainsym"){
+        syn.get_token();
+        return;
+      }
+      else{
+        continue;
+      }
     }
   }while(1);
 }
@@ -503,7 +642,6 @@ void block::funcs(){
 void block::paraList(){
   //＜参数表＞    ::=  ＜类型标识符＞＜标识符＞{,＜类型标识符＞＜标识符＞}| ＜空＞
   if(syn.typ=="rparen"){
-    //enter btab !!!!!
     syn.get_token();
     return;
   }
@@ -523,7 +661,12 @@ void block::paraList(){
       syn.get_token();
       if(syn.typ!="idnt"){
         cout<<"error!: func def ill idnt"<<endl;
-        while(1);
+        err.errormsg(11);
+        set<string> s;
+        s = err.initSet();
+        s.insert("comma");
+        err.test(s);
+        continue;
       }
       else
         {
@@ -531,13 +674,13 @@ void block::paraList(){
           syn.get_token();
           if(startP1==0){
             p1_addr = mytab.enterVar(Typ,name);
-            cout<<"paraList: "<<name<<" type: "<<Typ<<endl;
+            //cout<<"paraList: "<<name<<" type: "<<Typ<<endl;
             startP1=1;
             //mytab.enterBtab(1,tmp_btl_idx,p1_addr);
           }
           else{
             mytab.enterVar(Typ,name);
-            cout<<"paraList: "<<name<<" type: "<<Typ<<endl;
+            //cout<<"paraList: "<<name<<" type: "<<Typ<<endl;
             //mytab.enterBtab(2,tmp_btl_idx,p1_addr);
           }
           p1_num++;
@@ -547,30 +690,35 @@ void block::paraList(){
         }
   }while(syn.typ=="comma");
 
-  //enterBtab(3);
-
   if(syn.typ!="rparen"){
     cout<<"error!: paraList no rparen  "<<syn.tmp_token<<endl;
-    while(1);
+    err.errormsg(2);
+    if(isDown(syn.typ)){
+      syn.get_token();
+    }
+    return;
   }
   else{
     syn.get_token();
+    return;
   }
-  cout<<"finish paraList"<<endl;
+  //cout<<"finish paraList"<<endl;
 }
 
 void block::retFunc(){
   //＜有返回值函数定义＞  ::=  ＜声明头部＞‘(’＜参数＞‘)’ ‘{’＜复合语句＞‘}’
-  cout<<"there is a retfun"<<endl;
+  //cout<<"there is a retfun"<<endl;
   functyp=1; /// to weihu !!
   if(syn.typ!="lparen"){
     cout<<"error!: paraList no lparen  "<<syn.tmp_token<<endl;
-    while(1);
-  }
+    err.errormsg(3);
+    if(isUp(syn.typ)){
+      syn.get_token();
+    }
+  }  // continue
 
-  else{
+  {
 
-    // add
     if(funcName =="start"){
       glob_stab_end_indx = mytab.getSbl_idx(); // 偏移+1
     }
@@ -583,18 +731,19 @@ void block::retFunc(){
 
     func_start_stab_indx =  mytab.getSbl_idx();// 没有偏移！
 
-    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    cout<<"retfunc:  "<<name<<" type: "<<Typ<<endl;
     syn.get_token();
     paraList();
 
     {
       func_pare_stab_indx = mytab.getSbl_idx(); //偏移+1
-      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-      //syn.get_token();
-      //cout<<"$$$  "<<syn.tmp_token<<endl;
-      if(syn.typ=="rbrace"){
-        cout<<"error! no ret for retfunc!"<<endl;
+
+
+      if(syn.typ!="lbrace"){
+        cout<<"error!:func no rbrace "<<syn.tmp_token<<endl;
+        err.errormsg(5);
+        if(isUp(syn.typ)){
+          syn.get_token();
+        }
       }
 
       int p1_num = func_pare_stab_indx - func_start_stab_indx; //形参个数
@@ -604,10 +753,20 @@ void block::retFunc(){
       statement();
       if(syn.typ!="rbrace"){
         cout<<"error!:func no rbrace "<<syn.tmp_token<<endl;
-        while(1);
+        err.errormsg(4);
+        // same exp no get_token!
+        func_local_stab_indx = mytab.getSbl_idx(); // 偏移+1
+        p2_num = func_local_stab_indx - func_pare_stab_indx;
+        int num_tmp = genTmp.resetTmp();
+        int tmp_k = num_tmp+3; // 3=ra+sp+pad
+        mytab.enterFun(3,funcName,func_local_stab_indx-1,p2_num,tmp_k); //fix c_addr!
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        mytab.cal_addr(funcName);
+        if(isDown(syn.typ)){
+          syn.get_token();
+        }
       }
       else{
-
         func_local_stab_indx = mytab.getSbl_idx(); // 偏移+1
         p2_num = func_local_stab_indx - func_pare_stab_indx;
 
@@ -629,12 +788,14 @@ void block::voidFunc(){
   cout<<"there is a void func"<<endl;
   functyp = 2;
   if(syn.typ!="lparen"){
-    cout<<"error!: 函数参数表没有'('"<<endl;
-    while(1);
+    cout<<"error!: paraList lose'('"<<endl;
+    err.errormsg(3);
+    if(isUp(syn.typ)){
+      syn.get_token();
+    }
   }
-  else{
-    // add
 
+  {
     if(funcName =="start"){
       glob_stab_end_indx = mytab.getSbl_idx(); // 偏移+1
     }
@@ -650,33 +811,44 @@ void block::voidFunc(){
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 
-    cout<<"voidfunc:  "<<name<<" type: "<<Typ<<endl;
+    //cout<<"voidfunc:  "<<name<<" type: "<<Typ<<endl;
     syn.get_token();
     paraList();
     if(syn.typ!="lbrace"){
-      cout<<"error!:函数缺少‘{’ "<<endl;
-      while(1);
+      cout<<"error!:func lose ‘{’ "<<endl;
+      err.errormsg(5);
+      if(isDown(syn.typ)){
+        syn.get_token();
+      }
     }
     else{
+      syn.get_token();
+    }
+
+    {
       func_pare_stab_indx = mytab.getSbl_idx(); //偏移+1
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
-      syn.get_token();
-      if(syn.typ=="rbrace"){
-        cout<<"warnning! no ret for voidfunc!"<<endl;
-        syn.get_token();
-        return;
-      }
       int p1_num = func_pare_stab_indx - func_start_stab_indx; //形参个数
       mytab.enterFun(2,funcName,func_start_stab_indx,p1_num);
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       statement();
-      if(syn.typ!="rbrace"){
+      if(syn.typ!="rbrace"){ // not get token!
         cout<<"error!:func lose rbrace &&&"<<endl;
-        while(1);
+        err.errormsg(4);
+        func_local_stab_indx = mytab.getSbl_idx(); // 偏移+1
+        p2_num = func_local_stab_indx - func_pare_stab_indx;
+
+        int num_tmp = genTmp.resetTmp();
+        int tmp_k = num_tmp+3; // 3=ra+sp+pad
+        mytab.enterFun(3,funcName,func_local_stab_indx-1,p2_num,tmp_k); //fix c_addr!
+        //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+        mytab.cal_addr(funcName);
+        if(isDown(syn.typ)){
+          syn.get_token();
+        }
       }
       else{
-
         func_local_stab_indx = mytab.getSbl_idx(); // 偏移+1
         p2_num = func_local_stab_indx - func_pare_stab_indx;
 
@@ -702,6 +874,7 @@ void block::statement(){
   //mytab.enterBtab(3);//finish! add idx
   if(functyp==1&&syn.typ=="rbrace"){
     cout<<"error! ret func no return!"<<endl;
+    err.errormsg(16);
     //syn.get_token();
     return;
   }
@@ -716,24 +889,43 @@ void block::statement(){
 
 
 void block::whileSent(){
-  cout<<"there is a while cycle"<<endl;
+  //cout<<"there is a while cycle"<<endl;
   symbolTab* lab = new symbolTab;
   genLb.getLabel(lab);
   mdF.gen_mid_code("set_lab",lab);
   sent();
   if(syn.typ!="whilesym"){
     errormsg("no while in do while",syn.tmp_token);
+    err.errormsg(17);
+    set<string> s;
+    s = err.initSet();
+    s.insert("rparen");
+    err.test(s);
+    if(syn.typ=="rparen"){
+      syn.get_token();
+    }
   }
   else{
     syn.get_token();
     if(syn.typ!="lparen"){
       errormsg("no lparen in while",syn.tmp_token);
+      err.errormsg(3);
+      if(isUp(syn.typ)){
+        syn.get_token();
+      }
     }
     else {
       syn.get_token();
+    }
+
+    {
       condition(lab);
       if(syn.typ!="rparen"){
         errormsg("no rparen in while",syn.tmp_token);
+        err.errormsg(2);
+        if(isDown(syn.typ)){
+          syn.get_token();
+        }
       }
       else{
         syn.get_token();
@@ -747,220 +939,292 @@ void block::forSent(){
   //当前应为 ‘（’
   symbolTab* lab1 = new symbolTab;
   genLb.getLabel(lab1);
-
   symbolTab* lab2 = new symbolTab;
   genLb.getLabel(lab2);
-
   symbolTab* lab3 = new symbolTab;
   genLb.getLabel(lab3);
-
   symbolTab* lab4 = new symbolTab;
   genLb.getLabel(lab4);
-
   if(syn.typ!="lparen"){
     errormsg("no lparen! in for",syn.tmp_token);
+    err.errormsg(3);
+    if(isUp(syn.typ)){
+      syn.get_token();
+    }
   }
   else{
     syn.get_token();
-    if(syn.typ!="idnt"){
-      errormsg("for pl one no idnt!",syn.tmp_token);
+  }
+  if(syn.typ!="idnt"){
+    errormsg("for pl one no idnt!",syn.tmp_token);
+    err.errormsg(11);
+    set<string> s;
+    s = err.initSet();
+    s.insert("rparen");
+    err.test(s);
+  }
+  else{
+    symbolTab* sr1;
+    sr1 = check_sbl(funcName,syn.tmp_token);
+    syn.get_token();
+    if(syn.typ!="become"){
+      errormsg("for pl one no become!",syn.tmp_token);
+      err.errormsg(18);
+      set<string> s;
+      s = err.initSet();
+      s.insert("rparen");
+      s.insert("comma");
+      err.test(s);
     }
     else{
-      // To Do !! lookup tables!!!
-      //symbolTab* sr1 = new symbolTab;
-      symbolTab* sr1;
-      sr1 = check_sbl(funcName,syn.tmp_token);
-
       syn.get_token();
-      if(syn.typ!="become"){
-        errormsg("for pl one no become!",syn.tmp_token);
+      symbolTab* tmp=new symbolTab;
+      expression(tmp);
+      mdF.gen_mid_code("set",sr1,tmp);
+    }
+  }
+
+  if(syn.typ!="endcmd"){
+    errormsg("for p1 no endcmd",syn.tmp_token);
+    err.errormsg(1);
+    if(isEnd(syn.typ)){
+      syn.get_token();
+    }
+  }
+  else{
+    mdF.gen_mid_code("set_lab",lab4);
+    syn.get_token();
+    condition(lab2);
+    mdF.gen_mid_code("goto",lab1);
+    mdF.gen_mid_code("set_lab",lab3);
+  }
+  if(syn.typ!="endcmd"){
+    errormsg("for p2 no endcmd",syn.tmp_token);
+    err.errormsg(1);
+    if(isEnd(syn.typ)){
+      syn.get_token();
+    }
+  }
+  else{
+    syn.get_token();
+  }
+  if (syn.typ!="idnt") {
+    errormsg("for p3 ill idnt",syn.tmp_token);
+    err.errormsg(11);
+    set<string> s;
+    s = err.initSet();
+    s.insert("rparen");
+    s.insert("comma");
+    err.test(s);
+  }
+  else{
+    syn.get_token();
+    if(syn.typ!="become"){
+      errormsg("for p3 ill become",syn.tmp_token);
+      err.errormsg(18);
+      set<string> s;
+      s = err.initSet();
+      s.insert("rparen");
+      s.insert("comma");
+      err.test(s);
+    }
+    else{
+      syn.get_token();
+      if (syn.typ!="idnt") {
+        errormsg("for p3 ill idnt",syn.tmp_token);
+        err.errormsg(11);
+        set<string> s;
+        s = err.initSet();
+        s.insert("rparen");
+        s.insert("comma");
+        err.test(s);
       }
       else{
+        symbolTab* sr1;
+        sr1 = check_sbl(funcName,syn.tmp_token);
         syn.get_token();
-        symbolTab* tmp=new symbolTab;
-        expression(tmp);
-        mdF.gen_mid_code("set",sr1,tmp);
-        if(syn.typ!="endcmd"){
-          errormsg("for p1 no endcmd",syn.tmp_token);
+        if(syn.typ!="plus"&&syn.typ!="minus"){
+          errormsg("for p2 ill +,- ",syn.tmp_token);
+          err.errormsg(19);
+          set<string> s;
+          s = err.initSet();
+          s.insert("rparen");
+          s.insert("comma");
+          err.test(s);
         }
         else{
-          mdF.gen_mid_code("set_lab",lab4);
+          string opp = syn.typ;
           syn.get_token();
-          condition(lab2);
-          mdF.gen_mid_code("goto",lab1);
-          mdF.gen_mid_code("set_lab",lab3);
-          if(syn.typ!="endcmd"){
-            errormsg("for p2 no endcmd",syn.tmp_token);
+          if(syn.typ!="numsym"){
+            errormsg("for p3 ill num",syn.tmp_token);
+            err.errormsg(20);
+            set<string> s;
+            s = err.initSet();
+            s.insert("rparen");
+            s.insert("comma");
+            err.test(s);
           }
           else{
+            symbolTab* ttmp = new symbolTab;
+            ttmp->name = syn.tmp_token;
+            ttmp->typ = 1;
+            ttmp->cat = 8;
+            symbolTab* sr2 = new symbolTab;
+            genTmp.getTmpVar(sr2);
+            mdF.gen_mid_code("set_I",ttmp,sr2);
+            mdF.gen_mid_code(opp,sr1,sr2,sr1);
+            int bc = syn.str2num(syn.tmp_token,1);
             syn.get_token();
-            if (syn.typ!="idnt") {
-              errormsg("for p3 ill idnt",syn.tmp_token);
-              //### lookup tables!!
-            }
-            else{
-                //### lookup tables!!
-                syn.get_token();
-                if(syn.typ!="become"){
-                  errormsg("for p3 ill become",syn.tmp_token);
-
-                }
-                else{
-                  syn.get_token();
-                  if (syn.typ!="idnt") {
-                    errormsg("for p3 ill idnt",syn.tmp_token);
-                    //### lookup tables!!
-                  }
-                  else{
-                      symbolTab* sr1;
-                      sr1 = check_sbl(funcName,syn.tmp_token);//???##$$%%
-                      //### lookup tables!!
-                      syn.get_token();
-                      if(syn.typ!="plus"&&syn.typ!="minus"){
-                        errormsg("for p2 ill +,- ",syn.tmp_token);
-                      }
-                      else{
-                        string opp = syn.typ;
-                        syn.get_token();
-                        if(syn.typ!="numsym"){
-                          errormsg("for p3 ill num",syn.tmp_token);
-                        }
-                        else{
-                          symbolTab* ttmp = new symbolTab;
-                          ttmp->name = syn.tmp_token;
-                          //???##$$
-                          ttmp->typ = 1;
-                          ttmp->cat = 8;
-
-                          symbolTab* sr2 = new symbolTab;
-                          genTmp.getTmpVar(sr2);
-                          mdF.gen_mid_code("set_I",ttmp,sr2);
-                          mdF.gen_mid_code(opp,sr1,sr2,sr1);
-
-                          int bc = syn.str2num(syn.tmp_token,1);
-                          syn.get_token();
-                          if(syn.typ!="rparen"){
-                            errormsg("for p3 no rparen",syn.tmp_token);
-                          }
-                          else{
-                            mdF.gen_mid_code("goto",lab4);
-                            mdF.gen_mid_code("set_lab",lab2);
-                            syn.get_token();
-                            sent();
-                            mdF.gen_mid_code("goto",lab3);
-                            mdF.gen_mid_code("set_lab",lab1);
-                          }
-                        }
-                      }
-                  }
-                }
-            }
           }
         }
       }
     }
   }
+  if(syn.typ!="rparen"){
+    errormsg("for p3 no rparen",syn.tmp_token);
+    err.errormsg(2);
+    if(isDown(syn.typ)){
+      syn.get_token();
+    }
+    mdF.gen_mid_code("goto",lab4);
+    mdF.gen_mid_code("set_lab",lab2);
+    sent();
+    mdF.gen_mid_code("goto",lab3);
+    mdF.gen_mid_code("set_lab",lab1);
+  }
+  else{
+    mdF.gen_mid_code("goto",lab4);
+    mdF.gen_mid_code("set_lab",lab2);
+    syn.get_token();
+    sent();
+    mdF.gen_mid_code("goto",lab3);
+    mdF.gen_mid_code("set_lab",lab1);
+  }
 }
+
 
 void block::readSent(){
   if(syn.typ!="lparen"){
     errormsg("readSent lose lparen",syn.tmp_token);
+    err.errormsg(3);
+    if(isUp(syn.typ)){
+      syn.get_token();
+    }
   }
   else{
     syn.get_token();
+  }
+  if(syn.typ!="idnt"){
+    errormsg("readSent ill idnt",syn.tmp_token);
+    err.errormsg(21);
+    set<string> s;
+    s = err.initSet();
+    s.insert("comma");
+    s.insert("rparen");
+    err.test(s);
+  }
+  else{
+    symbolTab* sr1;
+    sr1 = check_sbl(funcName,syn.tmp_token);
+    mdF.gen_mid_code("read",sr1);
+    syn.get_token();
+  }
+
+  while(syn.typ=="comma"){
+    syn.get_token();
     if(syn.typ!="idnt"){
       errormsg("readSent ill idnt",syn.tmp_token);
+      err.errormsg(21);
+      set<string> s;
+      s = err.initSet();
+      s.insert("comma");
+      s.insert("rparen");
+      err.test(s);
     }
     else{
-      //lookup tables!
-      //cout<<"111"<<endl;
-      //symbolTab* sr1 = new symbolTab;
       symbolTab* sr1;
-      //cout<<"111"<<endl;
+      //cout<<funcName.c_str()<<endl;
+      //cout<<syn.tmp_token<<endl;
       sr1 = check_sbl(funcName,syn.tmp_token);
-      //cout<<"111"<<endl;
+      //cout<<sr1->name.c_str()<<endl;
+      //cout<<funcName.c_str()<<endl;
       mdF.gen_mid_code("read",sr1);
-      //cout<<"111"<<endl;
-
+      //cout<<"222"<<endl;
       syn.get_token();
-      //cout<<"111"<<endl;
-      while(syn.typ=="comma"){
-        //cout<<"222"<<endl;
-
-        syn.get_token();
-        if(syn.typ!="idnt"){
-          errormsg("readSent ill idnt",syn.tmp_token);
-        }
-        else{
-          //cout<<"222"<<endl;
-          //lookup tables!!
-          //symbolTab* sr1 = new symbolTab;
-          symbolTab* sr1;
-          cout<<funcName.c_str()<<endl;
-          cout<<syn.tmp_token<<endl;
-          sr1 = check_sbl(funcName,syn.tmp_token);
-          cout<<sr1->name.c_str()<<endl;
-          cout<<funcName.c_str()<<endl;
-          mdF.gen_mid_code("read",sr1);
-          cout<<"222"<<endl;
-          syn.get_token();
-        }
-      }
-      if(syn.typ!="rparen"){
-        errormsg("readSent lose rparen",syn.tmp_token);
-      }
-      else{
-        syn.get_token();
-      }
     }
+  }
+  if(syn.typ!="rparen"){
+    errormsg("readSent lose rparen",syn.tmp_token);
+    err.errormsg(2);
+    if(isDown(syn.typ)){
+      syn.get_token();
+    }
+  }
+  else{
+    syn.get_token();
   }
 }
 
 void block::writeSent(){
   if(syn.typ!="lparen"){
     errormsg("readSent lose lparen",syn.tmp_token);
+    if(isUp(syn.typ)){
+      syn.get_token();
+    }
   }
   else{
     syn.get_token();
-    if(syn.typ=="strsym"){
-      symbolTab* str = new symbolTab;
-      set_str(str);
-      mdF.gen_mid_code("write_str",str);
+  }
+  if(syn.typ=="strsym"){
+    symbolTab* str = new symbolTab;
+    set_str(str);
+    mdF.gen_mid_code("write_str",str);
+    syn.get_token();
+
+    if(syn.typ=="comma"){
       syn.get_token();
-      if(syn.typ=="comma"){
-        syn.get_token();
-        symbolTab* tmp = new symbolTab;
-        expression(tmp);
-        mdF.gen_mid_code("write_exp",tmp);
-        if(syn.typ!="rparen"){
-          errormsg("writeSent lose rpare $",syn.tmp_token);
-        }
-        else{
-          syn.get_token();
-          return;
-        }
-      }
-      else{
-        if(syn.typ!="rparen"){
-          errormsg("writeSent lose rpare $",syn.tmp_token);
-        }
-        else{
-          syn.get_token();
-          return;
-        }
-      }
-    }
-    else{
       symbolTab* tmp = new symbolTab;
       expression(tmp);
       mdF.gen_mid_code("write_exp",tmp);
       if(syn.typ!="rparen"){
         errormsg("writeSent lose rpare $",syn.tmp_token);
+        err.errormsg(2);
+        if(isDown(syn.typ)){
+          syn.get_token();
+        }
       }
       else{
         syn.get_token();
         return;
       }
+    }
+    else{
+      if(syn.typ!="rparen"){
+        errormsg("writeSent lose rpare $",syn.tmp_token);
+        err.errormsg(2);
+        if(isDown(syn.typ)){
+          syn.get_token();
+        }
+      }
+      else{
+        syn.get_token();
+      }
+    }
+  }
+  else{
+    symbolTab* tmp = new symbolTab;
+    expression(tmp);
+    mdF.gen_mid_code("write_exp",tmp);
+    if(syn.typ!="rparen"){
+      errormsg("writeSent lose rpare $",syn.tmp_token);
+      err.errormsg(2);
+      if(isDown(syn.typ)){
+        syn.get_token();
+      }
+    }
+    else{
+      syn.get_token();
+      return;
     }
   }
 }
@@ -1023,8 +1287,8 @@ void block::condition(symbolTab* &label){
     }
     else {
       cout<<"undef: logistic"<<endl;
+      err.errormsg(22);
     }
-
     return;
   }
   else{
@@ -1037,6 +1301,7 @@ void block::conditionSent(){
   //＜条件语句＞  ::=  if ‘(’＜条件＞‘)’＜语句＞［else＜语句＞］
   if(syn.typ!="lparen"){
     errormsg("conditionSent lose lparen",syn.tmp_token);
+    err.errormsg(3);
   }
   else{
     symbolTab* lab1 = new symbolTab;
@@ -1054,6 +1319,7 @@ void block::conditionSent(){
     mdF.gen_mid_code("set_lab",lab1);
     if(syn.typ!="rparen"){
       errormsg("conditionSent lose rparen",syn.tmp_token);
+      err.errormsg(2);
     }
     else{
       syn.get_token();
@@ -1085,7 +1351,6 @@ void block::sentS(){
   }while(chq);
 }
 int block::sent(){
-  //cout<<"******  "<<syn.tmp_token<<"^^^^   "<<syn.typ<<endl;
   if(syn.typ=="endcmd"){
     syn.get_token();
     return 1;
@@ -1093,34 +1358,43 @@ int block::sent(){
   else if(syn.typ=="dosym"){
     syn.get_token();
     whileSent();
-    //  syn.get_token();
       return 1;
   }
   else if(syn.typ=="forsym"){
-    cout<<"there is a for cycle"<<endl;
+    //cout<<"there is a for cycle"<<endl;
     syn.get_token();
     forSent();
     return 1;
   }
   else if(syn.typ=="readsym"){
-    cout<<"there is a read stat"<<endl;
+    //cout<<"there is a read stat"<<endl;
     syn.get_token();
     readSent();
     if(syn.typ!="endcmd"){
       errormsg("readSent ill end lose endcmd",syn.tmp_token);
+      err.errormsg(1);
+      if(isEnd(syn.typ)){
+          syn.get_token();
+      }
+      return 1;
     }
     else{
       syn.get_token();
-      cout<<"end readSent  "<<syn.tmp_token<<endl;
+      //cout<<"end readSent  "<<syn.tmp_token<<endl;
       return 1;
     }
   }
   else if(syn.typ=="writesym"){
-    cout<<"there is a writesym"<<endl;
+    //cout<<"there is a writesym"<<endl;
     syn.get_token();
     writeSent();
     if(syn.typ!="endcmd"){
       errormsg("writeSent ill end lose endcmd",syn.tmp_token);
+      err.errormsg(1);
+      if(isEnd(syn.typ)){
+          syn.get_token();
+      }
+      return 1;
     }
     else{
       syn.get_token();
@@ -1130,7 +1404,7 @@ int block::sent(){
   else if(syn.typ=="returnsym"){
     symbolTab* tmp_func;
     tmp_func = check_sbl(funcName);
-    cout<<"there is a return stat"<<endl;
+    //cout<<"there is a return stat"<<endl;
     syn.get_token();
     if(syn.typ=="lparen"){
       syn.get_token();
@@ -1138,12 +1412,14 @@ int block::sent(){
       expression(ret);
       if(syn.typ!="rparen"){
         errormsg("lose rparen in return",syn.tmp_token);
+        err.errormsg(2);
       }
-      else{
+      {
         mdF.gen_mid_code("return",ret,tmp_func);
         syn.get_token();
         if(syn.typ!="endcmd"){
           errormsg("losing endcmd",syn.tmp_token);
+          err.errormsg(1);
         }
         else{
           syn.get_token();
@@ -1152,28 +1428,31 @@ int block::sent(){
       }
     }
     else{
-      while(syn.typ!="endcmd") // to fix
+      if(syn.typ!="endcmd"){
+        err.errormsg(1);
+        mdF.gen_mid_code("returnNull",tmp_func);
+        return 1;
+      }
+      else{
         syn.get_token();
-      syn.get_token();
-
-      mdF.gen_mid_code("returnNull",tmp_func);
-      return 1;
+        mdF.gen_mid_code("returnNull",tmp_func);
+        return 1;
+      }
     }
-
   }
   else if(syn.typ=="lbrace"){
     syn.get_token();
     sentS();
     if(syn.typ!="rbrace"){
       errormsg("sent lose } ",syn.tmp_token);
+      err.errormsg(4);
+      return 1;
     }
-    //cout<<"%%%%%%  "<<syn.tmp_token<<endl;
     syn.get_token();
-    //cout<<"%%%%%%  "<<syn.tmp_token<<endl;
     return 1;
   }
   else if(syn.typ=="ifsym"){
-    cout<<"there is a if sent"<<endl;
+    //cout<<"there is a if sent"<<endl;
     syn.get_token();
     conditionSent();
     return 1; // 下一个单词已经读入！！
@@ -1182,7 +1461,7 @@ int block::sent(){
     //check table
     string Sname = syn.tmp_token; // save for use
     name = Sname;
-    cout<<"in idnt sent &&**(())  "<<name.c_str()<<endl;
+    //cout<<"in idnt sent &&**(())  "<<name.c_str()<<endl;
     syn.get_token();
     if(syn.typ=="lsquare"){
       //symbolTab* sr1 = new symbolTab;
@@ -1194,8 +1473,10 @@ int block::sent(){
       expression(sr2);
       if(syn.typ!="rsquare"){
         errormsg("lose rsquare!%%%%%",syn.tmp_token);
+        err.errormsg(6);
       }
-      else{
+      // set rsquare aut
+      {
         syn.get_token();
         if(syn.typ=="become"){
           symbolTab* dst = new symbolTab;
@@ -1204,6 +1485,11 @@ int block::sent(){
           mdF.gen_mid_code("set_array_val",sr1,sr2,dst);
           if(syn.typ!="endcmd"){
             errormsg("lose endcmd for becomeSent",syn.tmp_token);
+            err.errormsg(1);
+            if(isEnd(syn.typ)){
+              syn.get_token();
+            }
+            return 1;
           }
           else{
             syn.get_token();
@@ -1212,20 +1498,34 @@ int block::sent(){
         }
         else{
           errormsg("ill array become",syn.tmp_token);
+          err.errormsg(23);
+          set<string> s;
+          s = err.initSet();
+          err.test(s);
+          if(syn.typ == "endcmd"){
+            syn.get_token();
+          }
+          return 1;
         }
       }
     }
+
     else if(syn.typ=="become"){
       syn.get_token();
       symbolTab* tmp = new symbolTab;
-    //  symbolTab* sr1 = new symbolTab;
+      //  symbolTab* sr1 = new symbolTab;
       symbolTab* sr1;
       becomeSent(tmp);
-      cout<<"attention  "<<Sname.c_str()<<endl;
+      //cout<<"attention  "<<Sname.c_str()<<endl;
       sr1 = check_sbl(funcName,Sname);
       mdF.gen_mid_code("set",sr1,tmp);
       if(syn.typ!="endcmd"){
         errormsg("lose endcmd for becomeSent",syn.tmp_token);
+        err.errormsg(1);
+        if(isEnd(syn.typ)){
+          syn.get_token();
+        }
+        return 1;
       }
       else{
         syn.get_token();
@@ -1243,13 +1543,17 @@ int block::sent(){
 
       if(syn.typ!="endcmd"){
         cout<<"lose endcmd"<<endl;
+        err.errormsg(1);
+        if(isEnd(syn.typ)){
+          syn.get_token();
+        }
+        return 1;
       }
       else{
         syn.get_token();
         return 1;
       }
     }
-
   }
   else
     return 0;
@@ -1260,18 +1564,30 @@ void block::mainFunc(){
   //funcName = "main";
   if(syn.typ!="lparen"){
     cout<<"no {: "<<syn.tmp_token<<endl;
+    err.errormsg(3);
+    if(isUp(syn.typ)){
+      syn.get_token();
+    }
   }
   else{
     syn.get_token();
   }
   if(syn.typ!="rparen"){
     cout<<"no ): "<<syn.tmp_token<<endl;
+    err.errormsg(2);
+    if(isDown(syn.typ)){
+      syn.get_token();
+    }
   }
   else{
     syn.get_token();
   }
   if(syn.typ!="lbrace"){
     errormsg("no }: ",syn.tmp_token);
+    err.errormsg(5);
+    if(isUp(syn.typ)){
+      syn.get_token();
+    }
   }
   else{
     syn.get_token();
@@ -1279,8 +1595,9 @@ void block::mainFunc(){
 
   if(syn.typ=="rbrace")
     {
-      cout<<"warnning! no return in main"<<endl;
-      cout<<"finish main!"<<endl;
+      //cout<<"warnning! no return in main"<<endl;
+      err.errormsg(23);
+      //cout<<"finish main!"<<endl;
       return;
     }
 
@@ -1324,7 +1641,7 @@ void block::mainFunc(){
 
 void block::errormsg(string s,string token){
   cout<<s<<": "<<token<<endl;
-  while(1);
+  //while(1);
 }
 
 void block::becomeSent(symbolTab* &tmp){
@@ -1343,13 +1660,26 @@ void block::callSent(){
   if((tmp1->name=="#null")||((tmp1->cat!=5)&&tmp1->cat!=6)){
       cout<<tmp1->cat<<endl;
       errormsg("no def func calling ! to fix",tmp1->name);
+      err.errormsg(24);
+      set<string> s;
+      s = err.initSet();
+      s.insert("rparen");
+      err.test(s);
+      if(syn.typ == "rparen"){
+        syn.get_token();
+      }
+      return;
   }
-
 
   if(syn.typ!="lparen"){
     errormsg("lose lparen!",syn.tmp_token);
+    err.errormsg(3);
+    if(isUp(syn.typ)){
+      syn.get_token();
+    }
   }
-  else{
+// set auto
+  {
     syn.get_token();
     if(syn.typ!="rparen"){
       symbolTab* tmp = new symbolTab;
@@ -1374,8 +1704,10 @@ void block::callSent(){
 
         mdF.gen_mid_code("add_para",tmp,tmp2);
       }
+      // add check num of para
       if(syn.typ!="rparen"){
         errormsg("lose rparen",syn.tmp_token);
+        err.errormsg(2); // get_token below
       }
 
     }
@@ -1384,7 +1716,6 @@ void block::callSent(){
     mdF.gen_mid_code("end_func",tmp1,tmp2);//no use tmp2
     syn.get_token();
   }
-
 }
 
 
@@ -1410,13 +1741,19 @@ symbolTab* block::check_sbl(string funcName, string name){
     if(rett->name=="#null"){
       rett = mytab.cheq_stab(name,-1,glob_stab_end_indx-1); //check globe
       if(rett->name=="#null"){
-        cout<<"in"<<endl;
-        cout<<"^^^^^^"<<glob_stab_end_indx<<endl;
-        cout<<"&&&&&&&&&&&&"<<endl;
-        mytab.showStab(0,glob_stab_end_indx);
-        mytab.showStab(low,high);
-        while(1);
-        errormsg("aaa can't find "+name," in func: "+funcName);
+        //cout<<"in"<<endl;
+        //cout<<"^^^^^^"<<glob_stab_end_indx<<endl;
+        //cout<<"&&&&&&&&&&&&"<<endl;
+        //mytab.showStab(0,glob_stab_end_indx);
+        //mytab.showStab(low,high);
+        //while(1);
+        errormsg("can't find "+name," in func: "+funcName);
+        err.errormsg(25);
+        set<string> s;
+        s = err.initSet();
+        err.test(s);
+        rett->typ = 0;
+        return rett;
       }
       else
         return rett;
@@ -1424,8 +1761,17 @@ symbolTab* block::check_sbl(string funcName, string name){
     else
       return rett;
   }
-  else
+  else{
     errormsg("b can't find func named",funcName);
+    err.errormsg(24);
+    set<string> s;
+    s = err.initSet();
+    err.test(s);
+    symbolTab* a_rett = new symbolTab;
+    a_rett->name = "#null";
+    a_rett->typ = 0;
+    return a_rett;
+  }
 }
 
 symbolTab* block::check_sbl(string name){
@@ -1436,8 +1782,13 @@ symbolTab* block::check_sbl(string name){
     rett= &mytab.stab[cq];
     return rett;
   }
-  else
+  else{
     errormsg(" can't find func named",name);
+    err.errormsg(25);
+    set<string> s;
+    s = err.initSet();
+    err.test(s);
+  }
 }
 
 
@@ -1448,7 +1799,6 @@ void block::callRet(symbolTab* func,symbolTab* &tmp){
     mdF.gen_mid_code("begin_func",func);
   }
   else{
-
     symbolTab* tmp2 = new symbolTab;
     tmp2->name="@@para";
     tmp2->ref = 4;
@@ -1473,6 +1823,10 @@ void block::callRet(symbolTab* func,symbolTab* &tmp){
     }
     if(syn.typ!="rparen"){
       errormsg("lose rparen",syn.tmp_token);
+      err.errormsg(2);
+      if(isUp(syn.typ)){
+        syn.get_token();
+      }
     }
     else
       syn.get_token();
@@ -1493,4 +1847,39 @@ void block::set_str(symbolTab* str){
   str->name = syn.tmp_token;
   str->cat = 4;
   str->ref = mytab.addstr(syn.tmp_token);
+}
+int block::isUp(string s){
+  if(s=="lparen"){
+    return 1;
+  }
+  if(s=="lbrace"){
+    return 1;
+  }
+  if(s=="lsquare"){
+    return 1;
+  }
+  return 0;
+
+}
+int block::isDown(string s){
+  if(s=="rparen"){
+    return 1;
+  }
+  if(s=="rbrace"){
+    return 1;
+  }
+  if(s=="rsquare"){
+    return 1;
+  }
+  return 0;
+}
+
+int block::isEnd(string s){
+  if(s=="endcmd"){
+    return 1;
+  }
+  if(s=="comma"){
+    return 1;
+  }
+  return 0;
 }

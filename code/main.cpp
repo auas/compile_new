@@ -9,6 +9,7 @@
 
 #include "midCode.h"
 #include "mips.h"
+#include "error.h"
 
 using namespace std;
 
@@ -19,6 +20,7 @@ class genTmpVar genTmp;
 class genLabel genLb;
 class midCodeFunc mdF;
 class mips genMips;
+class error err;
 
 
 int main()
@@ -40,25 +42,25 @@ int main()
     mytab.get_addr_gb();
     bk.funcs();
     int num_gb = genTmp.resetTmp();
-
-
     bk.mainFunc();
     //cout<<"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"<<endl;
    // mytab.showStab(0,mytab.getSbl_idx());
-    cout<<"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
-    mytab.showBtab("test_loca_array");
-    mytab.showBtab("test_array");
-    cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
-    bk.showGlob();
-    cout<<"######################################"<<endl;
-    bk.showMainLocal();
-    cout<<"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"<<endl;
-    mytab.print_midCode();
+    //cout<<"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"<<endl;
+    //mytab.showBtab("test_loca_array");
+    //mytab.showBtab("test_array");
+    //cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
+    //bk.showGlob();
+    //cout<<"######################################"<<endl;
+    //bk.showMainLocal();
+    //cout<<"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"<<endl;
+    //mytab.print_midCode();
+
     //string a;
     //a.c_str();
     //genMips.genString();
+
     genMips.gen_mips();
-    bk.showMainLocal();
+    //bk.showMainLocal();
     //genMips.init_data();
 
     return 0;

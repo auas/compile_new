@@ -90,7 +90,7 @@ void mips::gen_mips(){
         else if(tmp_code->op == "end_func"){
           if(sr1->cat==5)
             SW(v(1),sr2);
-          cout<<"@@@@@@????@@@@@@@  "<<sr1->name<<" "<<sr1->cat<<endl;
+          //cout<<"@@@@@@????@@@@@@@  "<<sr1->name<<" "<<sr1->cat<<endl;
         }
         else if(tmp_code->op == "return"){
 
@@ -393,9 +393,9 @@ void mips::mips_set(symbolTab* sr1,symbolTab* sr2){
   LW(t(0),sr2);
   SW(t(0),sr1);
 
-  cout<<"***"<<endl;
-  cout<<sr1->name<<endl;
-  cout<<sr1->addr<<endl;
+  //cout<<"***"<<endl;
+  //cout<<sr1->name<<endl;
+  //cout<<sr1->addr<<endl;
 }
 
 void mips::mips_neg(symbolTab* sr1,symbolTab* sr2){

@@ -86,5 +86,9 @@ class block{
 
       void set_str(symbolTab* str);
 
+      int isUp(string s);
+      int isDown(string s);
+      int isEnd(string s);
+
 };
 # endif

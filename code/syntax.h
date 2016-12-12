@@ -11,7 +11,7 @@
 #include<string>
 using namespace std;
 class syntax{
-private:
+public:
 
     string filename,str;
     char line[1024]={0};
@@ -25,7 +25,7 @@ private:
     map<string,string> reserved;
 
 
-public:
+
     ifstream fin;
     char tmp_token[1024]={0};
     string typ="ntyp";

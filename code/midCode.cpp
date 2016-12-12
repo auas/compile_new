@@ -64,46 +64,67 @@ midCodeFunc::midCodeFunc(){
 }
 
 void midCodeFunc::gen_mid_code(string op){
-  cout<<"%%%%%%%%%%^^^^^^^ 0 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
+  //cout<<"%%%%%%%%%%^^^^^^^ 0 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
   midCode* tmp_code = new midCode;
-  symbolTab* s1 = new symbolTab;
+//cout<<"###  "<<tmp_code<<"$$ "<<mytab.ctl_idx<<endl;
+  symbolTab* sr1 = new symbolTab;
+  symbolTab* sr2 = new symbolTab;
+  symbolTab* dst = new symbolTab;
   mytab.ctab[mytab.ctl_idx] = tmp_code;
   tmp_code->op = op;
   tmp_code->typ = 0;
+  tmp_code->sr1 = sr1;
+  tmp_code->sr2 = sr2;
+  tmp_code->dst = dst;
+
   mytab.ctl_idx++;
 
 }
 
 
 void midCodeFunc::gen_mid_code(string op,symbolTab* sr1){
-  cout<<"%%%%%%%%%%^^^^^^^ 1 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
+  //cout<<"%%%%%%%%%%^^^^^^^ 1 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
   midCode* tmp_code = new midCode;
+//cout<<"###  "<<tmp_code<<"$$ "<<mytab.ctl_idx<<endl;
   mytab.ctab[mytab.ctl_idx] = tmp_code;
   tmp_code->op = op;
   tmp_code->sr1 = sr1;
   tmp_code->typ = 1;
+
+  symbolTab* sr2 = new symbolTab;
+  symbolTab* dst = new symbolTab;
+  tmp_code->sr2 = sr2;
+  tmp_code->dst = dst;
+
   mytab.ctl_idx++;
 
 }
 void midCodeFunc::gen_mid_code(string op,symbolTab* sr1,symbolTab* sr2){
-cout<<"%%%%%%%%%%^^^^^^^ 2 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
-  cout<<"hahahah"<<endl;
+//cout<<"%%%%%%%%%%^^^^^^^ 2 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
+  //cout<<"hahahah"<<endl;
   midCode* tmp_code = new midCode;
+//cout<<"###  "<<tmp_code<<"$$ "<<mytab.ctl_idx<<endl;
   mytab.ctab[mytab.ctl_idx] = tmp_code;
   tmp_code->op = op;
   tmp_code->sr1 = sr1;
   tmp_code->sr2 = sr2;
   tmp_code->typ = 2;
   //cout<<"************"<<tmp_code->op.c_str()<<endl;
-  cout<<mytab.ctl_idx<<endl;
+
+  symbolTab* dst = new symbolTab;
+  tmp_code->dst = dst;
+
+  //cout<<mytab.ctl_idx<<endl;
   //cout<<"$$$$$$$$$$$$$$$$$$$$$$   "<<sr1->name.c_str()<<endl;
   //cout<<"$$$$$$$$$$$$$$$$$$$$$$   "<<sr2->name.c_str()<<endl;
   mytab.ctl_idx++;
 
+
 }
 void midCodeFunc::gen_mid_code(string op,symbolTab* sr1,symbolTab* sr2,symbolTab* dst){
-cout<<"%%%%%%%%%%^^^^^^^ 3 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
+//cout<<"%%%%%%%%%%^^^^^^^ 3 ^^^^^^%%%%%%%%%%%% calling ! "<<op.c_str()<<endl;
   midCode* tmp_code = new midCode;
+//cout<<"###  "<<tmp_code<<"$$ "<<mytab.ctl_idx<<endl;
   mytab.ctab[mytab.ctl_idx] = tmp_code;
   tmp_code->op = op;
   tmp_code->sr1 = sr1;

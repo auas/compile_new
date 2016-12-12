@@ -29,11 +29,6 @@ syntax::syntax(){
         reserved["EOF"] = "eofsym";
     }
 char syntax::get_ch(){
-    /*
-    cout<<"******************"<<endl;
-
-    cout<<"******************"<<endl;
-    */
     if(ll==-1||indx_ch==ll+1){
         //read a line again
         if(!fin.eof()){
@@ -242,7 +237,7 @@ void syntax::get_token(){
     */
     //cout<<"token is: "<<tmp_token<<endl;
     //cout<<"typ is: "<<typ<<endl;
-    cout<<"@@@"<<tmp_token<<endl;
+    //cout<<"@@@"<<tmp_token<<endl;
 
 }
 void syntax::cpy_token(int st,int ed){

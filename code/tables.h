@@ -25,7 +25,7 @@ class tables{ // to do !!! limit name len !!! string 的问题！！
     int dataAddr ;//待分配的数据区
     symbolTab stab[1024]; //sbl_idx
     arrayTab atab[1024];//abl_idx
-    blockTab btab[10];//btl_idx
+    blockTab btab[30];//btl_idx
     midCode* ctab[2048]; //ctl_idx
     codeTab bt_ctab[2048];
     codeTab mips_ctab[2048];
