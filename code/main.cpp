@@ -58,7 +58,10 @@ int main()
     //string a;
     //a.c_str();
     //genMips.genString();
-
+    if(err.num!=0){
+      err.show_tot_err();
+      return 0;
+    }
     genMips.gen_mips();
     //bk.showMainLocal();
     //genMips.init_data();
