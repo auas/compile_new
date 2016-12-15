@@ -34,6 +34,9 @@ error::error(){
   errMap[25] = "undef ident";
   errMap[26] = "ill factor";
   errMap[27] = "duplicated defination";
+  errMap[28] = "ill token in syntax";
+  errMap[29] = "wrong tot num of para for func";
+  errMap[30] = "can't set val for const! ";
 }
 
 void error::show_tot_err(){

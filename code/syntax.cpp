@@ -4,7 +4,9 @@
 #include<fstream>
 #include<string>
 #include "syntax.h"
+#include "error.h"
 #include<sstream>
+extern class error err;
 syntax::syntax(){
         cout<<"enter file name"<<endl;
         cin>>filename;
@@ -187,6 +189,7 @@ void syntax::get_token(){
         else{
           typ = "ntyp";
           cout<<"error(ntyp,!)"<<endl;
+          err.errormsg(28);
           tmp_token[0]=' ';
           tmp_token[1]='\0';
         }
@@ -225,6 +228,7 @@ void syntax::get_token(){
         }
         else{
             cout<<"unknown char @@@@@@@@ error: "<<tmp_ch<<endl;
+            err.errormsg(28);
             typ="ntyp";
             tmp_token[0]=' ';
             tmp_token[1]='\0';
@@ -294,11 +298,15 @@ void syntax::find_char(){
       tmp_token[1] = '\0';
       get_ch();
     }
-    else
+    else{
       cout<<"error auas!!! in char 01"<<endl;
+      err.errormsg(28);
+    }
   }
-  else
+  else{
     cout<<"error auas!!! in char 02"<<endl;
+    err.errormsg(28);
+  }
 }
 
 bool syntax::isdigit(char ch){

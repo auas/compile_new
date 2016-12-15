@@ -91,5 +91,8 @@ class block{
       int isDown(string s);
       int isEnd(string s);
 
+
+      int check_para_tot(symbolTab* func);
+
 };
 # endif

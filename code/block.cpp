@@ -222,6 +222,9 @@ void block::factor(symbolTab* &tmp){ // !!unfinished!!
             return;
           }
           tmp->typ = sr1->typ;
+          if(sr1->cat ==1){
+            err.errormsg(30);
+          }
           mdF.gen_mid_code("set",tmp,sr1);
           //tmp = sr1;
           return;
@@ -1004,6 +1007,9 @@ void block::forSent(){
       syn.get_token();
       symbolTab* tmp=new symbolTab;
       expression(tmp);
+      if(sr1->cat ==1){
+        err.errormsg(30);
+      }
       mdF.gen_mid_code("set",sr1,tmp);
     }
   }
@@ -1542,6 +1548,14 @@ int block::sent(){
       becomeSent(tmp);
       //cout<<"attention  "<<Sname.c_str()<<endl;
       sr1 = check_sbl(funcName,Sname);
+
+
+      if(sr1->cat ==1){
+        err.errormsg(30);
+      }
+
+
+
       mdF.gen_mid_code("set",sr1,tmp);
       if(syn.typ!="endcmd"){
         errormsg("lose endcmd for becomeSent",syn.tmp_token);
@@ -1695,6 +1709,8 @@ void block::callSent(){
       return;
   }
 
+  int tot_para = check_para_tot(tmp1);
+  //cout<<tmp1->name<<"  **********************  "<<tot_para<<endl;
   if(syn.typ!="lparen"){
     errormsg("lose lparen!",syn.tmp_token);
     err.errormsg(3);
@@ -1702,9 +1718,18 @@ void block::callSent(){
       syn.get_token();
     }
   }
-// set auto
+  // set auto
   {
     syn.get_token();
+
+    int itt;
+    if(syn.typ=="rparen"){
+      itt = 0;
+    }
+    else{
+      itt = 1;
+    }
+
     if(syn.typ!="rparen"){
       symbolTab* tmp = new symbolTab;
       expression(tmp);
@@ -1714,7 +1739,8 @@ void block::callSent(){
       tmp2->ref = 4;
 
       mdF.gen_mid_code("add_para",tmp,tmp2);
-      int itt = 1;
+
+
       while(syn.typ=="comma"){
         //lookup
         itt++;
@@ -1728,12 +1754,17 @@ void block::callSent(){
 
         mdF.gen_mid_code("add_para",tmp,tmp2);
       }
+
       // add check num of para
       if(syn.typ!="rparen"){
         errormsg("lose rparen",syn.tmp_token);
         err.errormsg(2); // get_token below
       }
 
+    }
+
+    if(itt!=tot_para){
+      err.errormsg(29);
     }
     mdF.gen_mid_code("begin_func",tmp1);
     symbolTab* tmp2 = new symbolTab;
@@ -1841,21 +1872,31 @@ symbolTab* block::check_sbl(string name){
 
 void block::callRet(symbolTab* func,symbolTab* &tmp){
   //syn.get_token();
+  int tot_para = check_para_tot(func);
+  int itt = 0;
   if(syn.typ=="rparen"){
     syn.get_token();
+    if(itt!=tot_para){
+      err.errormsg(29);
+    }
     mdF.gen_mid_code("begin_func",func);
   }
+
   else{
+
+    //cout<<func->name<<"    **********************    "<<tot_para<<endl;
     symbolTab* tmp2 = new symbolTab;
     tmp2->name="@@para";
     tmp2->ref = 4;
 
     symbolTab* tmp1 = new symbolTab;
+
+    itt++;
     expression(tmp1);
     mdF.gen_mid_code("add_para",tmp1,tmp2);
 
 
-    int itt = 1;
+
     while(syn.typ=="comma"){
       itt++;
 
@@ -1867,6 +1908,9 @@ void block::callRet(symbolTab* func,symbolTab* &tmp){
       syn.get_token();
       expression(tmp1);
       mdF.gen_mid_code("add_para",tmp1,tmp2);
+    }
+    if(itt!=tot_para){
+      err.errormsg(29);
     }
     if(syn.typ!="rparen"){
       errormsg("lose rparen",syn.tmp_token);
@@ -1929,4 +1973,11 @@ int block::isEnd(string s){
     return 1;
   }
   return 0;
+}
+
+int block::check_para_tot(symbolTab* func){
+  int ret;
+  int ref = func->ref;
+  ret = mytab.btab[ref].p1_num;
+  return ret;
 }
