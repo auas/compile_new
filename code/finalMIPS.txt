@@ -19,12 +19,12 @@ const_lab:
 getn:
 	sw $sp,-4($sp)
 	sw $ra,0($sp)
-	addi $sp,$sp,-100
+	addi $sp,$sp,-108
 	li $t0,1
 	sw $t0,8($sp)
 	lw $t0,8($sp)
 	sw $t0,84($sp)
-	lw $t0,88($sp)
+	lw $t0,96($sp)
 	sw $t0,16($sp)
 	li $t0,16
 	sw $t0,24($sp)
@@ -38,13 +38,13 @@ $label0:
 	li $t0,16
 	sw $t0,32($sp)
 	lw $v1,32($sp)
-	lw $ra,100($sp)
-	lw $sp,96($sp)
+	lw $ra,108($sp)
+	lw $sp,104($sp)
 	jr $ra
 	 j $label2
 $label1:
 $label2:
-	lw $t0,88($sp)
+	lw $t0,96($sp)
 	sw $t0,40($sp)
 	li $t0,1
 	sw $t0,48($sp)
@@ -55,7 +55,7 @@ $label2:
 	nop
 	 j $label4
 $label3:
-	lw $t0,88($sp)
+	lw $t0,96($sp)
 	sw $t0,60($sp)
 	li $t0,1
 	sw $t0,64($sp)
@@ -74,8 +74,8 @@ $label3:
 	add $t0,$t0,$t1
 	sw $t0,68($sp)
 	lw $v1,68($sp)
-	lw $ra,100($sp)
-	lw $sp,96($sp)
+	lw $ra,108($sp)
+	lw $sp,104($sp)
 	jr $ra
 	 j $label5
 $label4:
@@ -83,11 +83,11 @@ $label5:
 	li $t0,1
 	sw $t0,80($sp)
 	lw $v1,80($sp)
-	lw $ra,100($sp)
-	lw $sp,96($sp)
+	lw $ra,108($sp)
+	lw $sp,104($sp)
 	jr $ra
-	lw $ra,100($sp)
-	lw $sp,96($sp)
+	lw $ra,108($sp)
+	lw $sp,104($sp)
 	jr $ra
 quicksort:
 	sw $sp,-4($sp)

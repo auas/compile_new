@@ -33,6 +33,7 @@ error::error(){
   errMap[24] = "undef func";
   errMap[25] = "undef ident";
   errMap[26] = "ill factor";
+  errMap[27] = "duplicated defination";
 }
 
 void error::show_tot_err(){

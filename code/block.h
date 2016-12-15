@@ -79,6 +79,7 @@ class block{
       void showMainLocal();
 
       symbolTab* check_sbl(string funcName, string name);//根据函数名称查name的符号
+      symbolTab* check_sbl(string funcName, string name,int a);
       symbolTab* check_sbl(string name);// for func!
 
 

@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1481508091 source:c:\compile_auas-master\code\block.cpp
+1481792743 source:c:\compile_auas-master\code\block.cpp
 	<stdio.h>
 	<map>
 	<fstream>
@@ -21,7 +21,7 @@
 	<map>
 	<string>
 
-1481468960 c:\compile_auas-master\code\block.h
+1481792052 c:\compile_auas-master\code\block.h
 	"tables.h"
 
 1481510101 c:\compile_auas-master\code\tables.h
@@ -91,7 +91,7 @@
 	<set>
 	<map>
 
-1481470918 source:c:\compile_auas-master\code\error.cpp
+1481789530 source:c:\compile_auas-master\code\error.cpp
 	"error.h"
 	"syntax.h"
 	<map>

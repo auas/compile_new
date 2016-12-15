@@ -386,6 +386,14 @@ void block::constDef(){
       int interger_val = integer();
       //todo :登陆符号表！！ 具体数值暂时没有登陆！！！
       symbolTab* sr1;
+
+      // cherk duplicated def
+      symbolTab* chq = check_sbl(funcName, cnst_name,1);
+      if(chq->name!="#null"){
+        err.errormsg(27);
+        continue;
+      }
+
       sr1 = mytab.enterCnst(1,cnst_name);//syn.get_token(); 在integer()中完成 is int
       symbolTab* sr2 = new symbolTab;
       sr2->typ = sr1->typ; //
@@ -430,6 +438,15 @@ void block::constDef(){
         err.test(s);
         // set 0 as rest
         symbolTab* sr1;
+
+        // cherk duplicated def
+        symbolTab* chq = check_sbl(funcName, cnst_name,1);
+        if(chq->name!="#null"){
+          err.errormsg(27);
+          continue;
+        }
+
+
         sr1 = mytab.enterCnst(2,cnst_name);//syn.get_token(); 在integer()中完成
         symbolTab* sr2 = new symbolTab;
         sr2->cat = 8;
@@ -518,6 +535,13 @@ void block::varDef(){
     }
     else{
       name = syn.tmp_token;
+      // cherk duplicated def
+      symbolTab* chq = check_sbl(funcName, name,1);
+      if(chq->name!="#null"){
+        err.errormsg(27);
+      }
+
+
       syn.get_token();
       if(syn.typ=="lsquare") // '['
         {
@@ -1741,12 +1765,6 @@ symbolTab* block::check_sbl(string funcName, string name){
     if(rett->name=="#null"){
       rett = mytab.cheq_stab(name,-1,glob_stab_end_indx-1); //check globe
       if(rett->name=="#null"){
-        //cout<<"in"<<endl;
-        //cout<<"^^^^^^"<<glob_stab_end_indx<<endl;
-        //cout<<"&&&&&&&&&&&&"<<endl;
-        //mytab.showStab(0,glob_stab_end_indx);
-        //mytab.showStab(low,high);
-        //while(1);
         errormsg("can't find "+name," in func: "+funcName);
         err.errormsg(25);
         set<string> s;
@@ -1760,6 +1778,35 @@ symbolTab* block::check_sbl(string funcName, string name){
     }
     else
       return rett;
+  }
+  else{
+    errormsg("b can't find func named",funcName);
+    err.errormsg(24);
+    set<string> s;
+    s = err.initSet();
+    err.test(s);
+    symbolTab* a_rett = new symbolTab;
+    a_rett->name = "#null";
+    a_rett->typ = 0;
+    return a_rett;
+  }
+}
+
+symbolTab* block::check_sbl(string funcName, string name,int a){
+  int cat,typ,ref;
+  symbolTab* rett;
+  bool cq = mytab.isThere(funcName,0,mytab.sbl_idx,&cat,&typ,&ref);
+  if (cq&&(cat==5||cat==6)){
+    blockTab tmp1 = mytab.btab[ref];
+    int low = tmp1.p1_addr;
+    //int high = tmp.p2_addr; // not in yet!
+    int high = mytab.sbl_idx;
+    rett = mytab.cheq_stab(name,low-1,high-1); //check local
+    return rett;
+  }
+  else if(funcName=="start"){
+    rett = mytab.cheq_stab(name,-1,mytab.sbl_idx-1); //check globe
+    return rett;
   }
   else{
     errormsg("b can't find func named",funcName);
