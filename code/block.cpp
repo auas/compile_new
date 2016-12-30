@@ -36,7 +36,7 @@ block::block(){
 }
 
 void block::expression(symbolTab* &tmp){
-  cout<<"there is a expression"<<endl;
+  //cout<<"there is a expression"<<endl;
 
   tmp = new symbolTab;
   genTmp.getTmpVar(tmp);
@@ -491,7 +491,7 @@ void block::var(){
     }
     varDef();
   }while(syn.typ=="endcmd");
-  cout<<"there is a var def"<<endl;
+  //cout<<"there is a var def"<<endl;
 }//变量说明
 void block::varDef(){
   //＜变量定义＞  ::= ＜类型标识符＞(＜标识符＞|＜标识符＞‘[’＜无符号整数＞‘]’){,(＜标识符＞|＜标识符＞‘[’＜无符号整数＞‘]’) }
@@ -812,7 +812,7 @@ void block::retFunc(){
 }//有返回值的函数定义
 
 void block::voidFunc(){
-  cout<<"there is a void func"<<endl;
+  //cout<<"there is a void func"<<endl;
   functyp = 2;
   if(syn.typ!="lparen"){
     cout<<"error!: paraList lose'('"<<endl;
@@ -1286,7 +1286,7 @@ int block::islogic(string s){
 
 void block::condition(symbolTab* &label){
   //＜条件＞    ::=  ＜表达式＞＜关系运算符＞＜表达式＞｜＜表达式＞
-  cout<<"there is a condition"<<endl;
+  //cout<<"there is a condition"<<endl;
   symbolTab* tmp1 = new symbolTab;
   expression(tmp1);
   //cout<<"&&&&&&&&&&"<<syn.typ<<endl;
@@ -1374,7 +1374,7 @@ void block::conditionSent(){
 
 void block::sentS(){
   //syn.typ!="rbrace"
-  cout<<"there is a sentS"<<endl;
+  //cout<<"there is a sentS"<<endl;
   int chq;
   do{
     chq = sent();
@@ -1573,7 +1573,7 @@ int block::sent(){
     else if(syn.typ=="lparen"){
       //errormsg("maybe func to fix!",syn.tmp_token);
       //cout<<"可能是函数调用或赋值语句，待解决"<<endl;
-      cout<<"there is a func calling"<<endl;
+      //cout<<"there is a func calling"<<endl;
       mytab.isReFunc(Sname);
       mytab.isVdFunc(Sname);
       //syn.get_token();

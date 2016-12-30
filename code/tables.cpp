@@ -191,7 +191,7 @@ int tables::isReFunc(string name){
   int cat,typ,ref;
   bool cq = isThere(name,0,sbl_idx,&cat,&typ,&ref);
   if(cq&&cat==5){
-    cout<<"there is a ret func"<<endl;
+    //cout<<"there is a ret func"<<endl;
     return ref;
   }
   else
@@ -201,7 +201,7 @@ int tables::isVdFunc(string name){
   int cat,typ,ref;
   bool cq = isThere(name,0,sbl_idx,&cat,&typ,&ref);
   if(cq&&cat==6){
-    cout<<"there is a ret func"<<endl;
+    //cout<<"there is a ret func"<<endl;
     return ref;
   }
   else
@@ -336,7 +336,7 @@ int tables::change_addr(int p1,int p2,int tmp_k){
 
   }
   //showStab(p1,p2);
-  cout<<"@@"<<endl;
+  //cout<<"@@"<<endl;
   //while(1);
   return k;
 } // tmp_k = 2+tmp_num

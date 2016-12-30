@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1481792743 source:c:\compile_auas-master\code\block.cpp
+1482544164 source:c:\compile_auas-master\code\block.cpp
 	<stdio.h>
 	<map>
 	<fstream>
@@ -21,14 +21,14 @@
 	<map>
 	<string>
 
-1481792052 c:\compile_auas-master\code\block.h
+1481797870 c:\compile_auas-master\code\block.h
 	"tables.h"
 
 1481510101 c:\compile_auas-master\code\tables.h
 	<string>
 	"add.h"
 
-1481510280 source:c:\compile_auas-master\code\main.cpp
+1481796922 source:c:\compile_auas-master\code\main.cpp
 	<iostream>
 	<stdio.h>
 	<map>
@@ -50,16 +50,17 @@
 	"tables.h"
 	"add.h"
 
-1481506221 source:c:\compile_auas-master\code\syntax.cpp
+1481797330 source:c:\compile_auas-master\code\syntax.cpp
 	<iostream>
 	<stdio.h>
 	<map>
 	<fstream>
 	<string>
 	"syntax.h"
+	"error.h"
 	<sstream>
 
-1480733116 source:c:\compile_auas-master\code\tables.cpp
+1482544234 source:c:\compile_auas-master\code\tables.cpp
 	"tables.h"
 	<iostream>
 	<stdio.h>
@@ -83,7 +84,7 @@
 	"tables.h"
 	"midCode.h"
 
-1481510237 source:c:\compile_auas-master\code\mips.cpp
+1482543784 source:c:\compile_auas-master\code\mips.cpp
 	"mips.h"
 
 1481293279 c:\compile_auas-master\code\error.h
@@ -91,7 +92,7 @@
 	<set>
 	<map>
 
-1481789530 source:c:\compile_auas-master\code\error.cpp
+1481799760 source:c:\compile_auas-master\code\error.cpp
 	"error.h"
 	"syntax.h"
 	<map>

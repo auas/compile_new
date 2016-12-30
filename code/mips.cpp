@@ -95,8 +95,11 @@ void mips::gen_mips(){
         else if(tmp_code->op == "return"){
 
           int c_addr = mytab.btab[sr2->ref].c_addr;
-          //if(sr1->cat==5)
-            LW(v(1),sr1);
+          if(sr2->cat==6){
+            cout<< "waring! return a value in voidfunc: "<<sr2->name.c_str()<<endl;
+          }
+
+          LW(v(1),sr1);
           lw(ra(),shift(c_addr,sp()));
           lw(sp(),shift(c_addr-4,sp()));
 
@@ -104,6 +107,9 @@ void mips::gen_mips(){
         }
         else if(tmp_code->op == "returnNull"){
           int c_addr = mytab.btab[sr1->ref].c_addr;
+          if(sr1->cat==5){
+            cout<<"waring! no return value in returnfunc: "<<sr1->name.c_str()<<endl;
+          }
           lw(ra(),shift(c_addr,sp()));
           lw(sp(),shift(c_addr-4,sp()));
           jr(ra());
