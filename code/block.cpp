@@ -491,7 +491,7 @@ void block::var(){
     }
     varDef();
   }while(syn.typ=="endcmd");
-  cout<<"there is a var def"<<endl;
+  //cout<<"there is a var def"<<endl;
 }//变量说明
 void block::varDef(){
   //＜变量定义＞  ::= ＜类型标识符＞(＜标识符＞|＜标识符＞‘[’＜无符号整数＞‘]’){,(＜标识符＞|＜标识符＞‘[’＜无符号整数＞‘]’) }
@@ -1866,6 +1866,9 @@ symbolTab* block::check_sbl(string name){
     set<string> s;
     s = err.initSet();
     err.test(s);
+    rett = new symbolTab;
+    rett->name = "#null";
+    rett->cat = 0;
   }
 }
 
